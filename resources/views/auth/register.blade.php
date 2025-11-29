@@ -4,9 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Daftar - IP School</title>
+    <!-- Poppins from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root{--bg:#f3f4f6;--card:#ffffff;--accent:#2563eb;--muted:#6b7280}
-        html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+        html,body{height:100%;margin:0;font-family:'Poppins',Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
         body{background:linear-gradient(180deg, #eef2ff 0%, var(--bg) 100%);display:flex;align-items:center;justify-content:center}
         .container{width:100%;max-width:420px;padding:24px}
         .card{background:var(--card);border-radius:12px;box-shadow:0 6px 24px rgba(15,23,42,0.08);padding:28px}
@@ -22,6 +24,7 @@
     </style>
 </head>
 <body>
+    @include('partials.header')
     <div class="container">
         <div class="card">
             <h1>Buat Akun</h1>
