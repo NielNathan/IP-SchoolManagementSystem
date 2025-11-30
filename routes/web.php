@@ -2,22 +2,24 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\InstructorController;
 
-Route::get('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'register']);
+// --- LOGIN CUSTOM KITA ---
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'authenticate'])->name('login.process');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/login_process', [AuthController::class, 'login_process']);
-Route::post('/register_process', [AuthController::class, 'register_process']);
+// --- REDIRECT ROOT ---
+Route::get('/', function () { return redirect('/login'); });
 
-// Home routes for roles
-Route::get('/student/home', function () {
-	return view('student.home');
-})->name('student.home')->middleware([\App\Http\Middleware\EnsureRoleStudent::class]);
+// --- STUDENT ---
+Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->group(function () {
+    Route::get('/student-dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::post('/enroll-course', [StudentController::class, 'enroll'])->name('student.enroll');
+});
 
-Route::get('/teacher/home', function () {
-	return view('teacher.home');
-})->name('teacher.home')->middleware([\App\Http\Middleware\EnsureRoleTeacher::class]);
-
-Route::get('/admin/home', function () {
-	return view('admin.home');
-})->name('admin.home')->middleware([\App\Http\Middleware\EnsureRoleAdmin::class]);
+// --- INSTRUCTOR ---
+Route::middleware(['auth'])->group(function () {
+    Route::get('/instructor-dashboard', [InstructorController::class, 'index'])->name('instructor.dashboard');
+});

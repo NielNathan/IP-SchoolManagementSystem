@@ -3,80 +3,54 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login()
+    // 1. Tampilkan Halaman Login
+    public function showLoginForm()
     {
-        return view('auth.login');
+        return view('auth.login'); // Pastikan file blade ada di folder resources/views/auth/login.blade.php
     }
 
-    public function login_process(Request $request)
+    // 2. Proses Login
+    public function authenticate(Request $request)
     {
-
-        $request->validate([
-            'name' => 'required|string',
-            'password' => 'required|string',
-            'remember' => 'nullable',
+        // Validasi input
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        $password = $request->input('password');
-
-        if ($request->filled('name')) {
-            $credentials = ['name' => $request->input('name'), 'password' => $password];
-        } else {
-            return back()->withErrors(['name' => 'Please provide a name.'])->withInput();
-        }
-
-        $remember = $request->boolean('remember');
-
-        if (Auth::attempt($credentials, $remember)) {
+        // Coba Login
+        if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
 
-            $role = Auth::user()->role ?? 'student';
+            // LOGIKA PENGARAHAN (REDIRECT)
+            $role = Auth::user()->role;
 
-            switch ($role) {
-                case 'admin':
-                    $redirect = route('admin.home');
-                    break;
-                case 'teacher':
-                    $redirect = route('teacher.home');
-                    break;
-                case 'student':
-                default:
-                    $redirect = route('student.home');
-                    break;
+            if ($role === 'student') {
+                return redirect()->route('student.dashboard');
+            } elseif ($role === 'teacher') {
+                return redirect()->route('instructor.dashboard');
             }
 
-            return redirect()->intended($redirect);
+            // Kalau admin/role lain
+            return redirect('/');
         }
 
-        return back()->withErrors(['password' => 'The provided credentials do not match our records.'])->withInput();
+        // Kalau Gagal Login
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->onlyInput('email');
     }
 
-    public function register()
+    // 3. Proses Logout
+    public function logout(Request $request)
     {
-        return view('auth.register');
-    }
-
-    public function register_process(Request $request)
-    {
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        return redirect('/login')->with('success', 'Registration successful. You may now log in.');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
     }
 }
