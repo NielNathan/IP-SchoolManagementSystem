@@ -7,7 +7,6 @@
 @section('content')
 <div class="space-y-6">
 
-    {{-- Student Stats --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <p class="text-sm text-gray-500 dark:text-gray-400">Kelas</p>
@@ -25,7 +24,6 @@
         </div>
     </div>
 
-    {{-- Chart --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
@@ -40,7 +38,6 @@
 
     </div>
 
-    {{-- Assignment List --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
         <h4 class="font-semibold mb-4">Tugas Terbaru</h4>
 
@@ -71,7 +68,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ===== Line Chart (Progress Nilai) =====
     const lineEl = document.getElementById('studentLineChart');
     if (lineEl) {
         new Chart(lineEl.getContext('2d'), {
@@ -89,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ===== Doughnut Chart =====
     const doughEl = document.getElementById('studentDoughnutChart');
     if (doughEl) {
         new Chart(doughEl.getContext('2d'), {

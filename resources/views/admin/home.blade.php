@@ -5,14 +5,12 @@
     <title>Dashboard - IP School</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
 <body class="bg-gray-100">
 
-    <!-- SIDEBAR -->
     <div class="flex">
 
         <aside class="w-64 h-screen bg-white shadow-md fixed">
@@ -37,10 +35,8 @@
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="ml-64 w-full">
 
-            <!-- TOPBAR -->
             <header class="bg-white shadow p-4 flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Dashboard</h2>
 
@@ -49,12 +45,10 @@
                 </div>
             </header>
 
-            <!-- CONTENT -->
             <div class="p-6">
 
                 <h3 class="text-lg font-semibold mb-4">Statistik Sekolah</h3>
 
-                <!-- Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                     <div class="bg-white p-6 rounded-xl shadow">
@@ -74,7 +68,7 @@
 
                 </div>
 
-                <!-- Schedule Table -->
+
                 <div class="mt-10">
 
                     <h3 class="text-lg font-semibold mb-4">Jadwal Hari Ini</h3>
@@ -104,13 +98,10 @@
 
     </div>
 
-    <!-- SCRIPT -->
     <script>
-        // === FETCH DATA DARI BACKEND ===
         async function loadDashboard() {
 
             try {
-                // Ganti URL API backend kamu
                 const base = "http://localhost:8000/api";
 
                 const [students, instructors, subjects, schedule] = await Promise.all([
@@ -120,12 +111,12 @@
                     fetch(base + "/schedule/today").then(r => r.json()),
                 ]);
 
-                // Update angka di card
+                // update angka di card
                 document.getElementById("total_students").textContent = students.total || 0;
                 document.getElementById("total_instructors").textContent = instructors.total || 0;
                 document.getElementById("total_subjects").textContent = subjects.total || 0;
 
-                // Update jadwal hari ini
+                // update jadwal hari ini
                 const tbody = document.getElementById("schedule_table");
                 tbody.innerHTML = "";
 
@@ -143,7 +134,6 @@
                     tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Tidak ada jadwal hari ini</td></tr>`;
                 }
 
-                // Dummy user name
                 document.getElementById("user-info").textContent = "Selamat datang, Admin";
 
             } catch (e) {
@@ -154,7 +144,6 @@
 
         loadDashboard();
 
-        // === LOGOUT ===
         function logout() {
             alert("Anda telah logout");
             window.location.href = "login.html";

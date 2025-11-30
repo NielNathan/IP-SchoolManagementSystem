@@ -7,7 +7,6 @@
 @section('content')
 <div class="space-y-6">
 
-    {{-- Teacher top stats --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <p class="text-sm text-gray-500 dark:text-gray-400">Total Kelas</p>
@@ -25,7 +24,6 @@
         </div>
     </div>
 
-    {{-- Charts --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <h4 class="font-semibold mb-4">Nilai Rata-rata Kelas (Bar)</h4>
@@ -38,7 +36,6 @@
         </div>
     </div>
 
-    {{-- Class list --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
         <h4 class="font-semibold mb-4">Kelas yang Anda Bimbing</h4>
 
@@ -65,7 +62,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ===== Bar Chart (Nilai) =====
     const barEl = document.getElementById('teacherBarChart');
     if (barEl) {
         new Chart(barEl.getContext('2d'), {
@@ -81,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ===== Line Chart (Kehadiran) =====
     const lineEl = document.getElementById('teacherLineChart');
     if (lineEl) {
         new Chart(lineEl.getContext('2d'), {
