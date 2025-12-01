@@ -1,26 +1,19 @@
 <?php
-
 namespace App\Http\Middleware;
-
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EnsureRoleStudent
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
-            return redirect('/login');
+        // Cek Login & Role
+        if (Auth::check() && Auth::user()->role === 'student') {
+            return $next($request);
         }
-
-        if (Auth::user()->role !== 'student') {
-            abort(403, 'Unauthorized.');
-        }
-
-        return $next($request);
+        
+        // Kalau bukan siswa, tendang keluar
+        abort(403, 'Anda bukan Siswa!');
     }
 }

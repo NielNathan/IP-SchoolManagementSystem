@@ -8,19 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class EnsureRoleAdmin
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
-            return redirect('/login');
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return $next($request);
         }
-
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized.');
-        }
-
-        return $next($request);
+        abort(403, 'Akses Ditolak. Halaman ini khusus Admin.');
     }
 }
