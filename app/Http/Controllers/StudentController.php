@@ -72,4 +72,17 @@ class StudentController extends Controller
 
         return back()->with('success', 'Mata pelajaran berhasil dihapus dari jadwal.');
     }
+
+    // DASHBOARD - Tampilkan Profil Student
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return "Error: Data Profile Siswa tidak ditemukan.";
+        }
+
+        return view('student.dashboard', compact('student'));
+    }
 }

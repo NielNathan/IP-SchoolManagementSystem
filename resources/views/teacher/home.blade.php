@@ -30,6 +30,7 @@
     </style>
 </head>
 <body>
+    @include('partials.header-home')
 
     <div class="container">
         <div class="header-section">

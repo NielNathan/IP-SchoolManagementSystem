@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->group(function () {
     Route::get('/student-dashboard', [StudentController::class, 'index'])->name('student.index');
+    Route::get('/student-profile', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::post('/enroll-course', [StudentController::class, 'enroll'])->name('student.enroll');
     Route::post('/unenroll-course', [StudentController::class, 'unenroll'])->name('student.unenroll');
 });

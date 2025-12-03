@@ -73,7 +73,7 @@ class AuthController extends Controller
         }
         // D. Langsung Login Otomatis
         Auth::login($user);
-        return redirect()->route('student.index')->with('success', 'Pendaftaran berhasil! Selamat datang.');
+        return redirect()->route('student.dashboard')->with('success', 'Pendaftaran berhasil! Selamat datang.');
     }
     
     // 1. Tampilkan Halaman Login
@@ -99,7 +99,7 @@ class AuthController extends Controller
             $role = Auth::user()->role;
 
             if ($role === 'student') {
-                return redirect()->route('student.index');
+                return redirect()->route('student.dashboard');
             } elseif ($role === 'teacher') {
                 return redirect()->route('instructor.dashboard');
             } elseif ($role === 'admin') {
