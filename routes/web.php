@@ -13,7 +13,9 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/', function () { return redirect('/login'); });
+Route::get('/', function () { 
+    return redirect('/home'); 
+});
 
 Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->group(function () {
     Route::get('/student-dashboard', [StudentController::class, 'index'])->name('student.index');
