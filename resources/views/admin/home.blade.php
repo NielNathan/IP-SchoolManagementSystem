@@ -1,154 +1,123 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard - IP School</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard - IP School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .logout-btn { background-color: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card h3 { margin: 0; color: #6b7280; font-size: 14px; text-transform: uppercase; }
+        .card .number { font-size: 32px; font-weight: 700; color: #111827; margin-top: 5px; }
+        .card.highlight { border-left: 5px solid #2563eb; }
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
+        /* Tables */
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #374151; }
+        .table-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f9fafb; font-weight: 600; color: #374151; }
+        
+        /* List Siswa di dalam tabel */
+        .student-list { margin: 0; padding-left: 20px; font-size: 13px; color: #4b5563; }
+    </style>
 </head>
+<body>
 
-<body class="bg-gray-100">
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Administrator Panel</h1>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
 
-    <div class="flex">
-
-        <aside class="w-64 h-screen bg-white shadow-md fixed">
-            <div class="p-6 border-b">
-                <h1 class="font-bold text-lg">IP School</h1>
-                <p class="text-sm text-gray-600">Dashboard</p>
+        <div class="stats-grid">
+            <div class="card highlight">
+                <h3>Total Siswa</h3>
+                <div class="number">{{ $totalSiswa }}</div>
             </div>
-
-            <nav class="mt-4">
-                <a href="#" class="block py-3 px-6 hover:bg-blue-50">🏠 Dashboard</a>
-                <a href="#" class="block py-3 px-6 hover:bg-blue-50">👨‍🎓 Students</a>
-                <a href="#" class="block py-3 px-6 hover:bg-blue-50">👨‍🏫 Instructors</a>
-                <a href="#" class="block py-3 px-6 hover:bg-blue-50">📚 Courses</a>
-                <a href="#" class="block py-3 px-6 hover:bg-blue-50">📖 Subjects</a>
-                <a href="#" class="block py-3 px-6 hover:bg-blue-50">📅 Schedules</a>
-
-                <hr class="my-4">
-
-                <button onclick="logout()" class="block py-3 px-6 text-red-600 hover:bg-red-50 w-full text-left">
-                    🚪 Logout
-                </button>
-            </nav>
-        </aside>
-
-        <main class="ml-64 w-full">
-
-            <header class="bg-white shadow p-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold">Dashboard</h2>
-
-                <div id="user-info" class="font-medium text-gray-700">
-                    Memuat...
-                </div>
-            </header>
-
-            <div class="p-6">
-
-                <h3 class="text-lg font-semibold mb-4">Statistik Sekolah</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <div class="bg-white p-6 rounded-xl shadow">
-                        <p class="text-gray-500">Total Siswa</p>
-                        <h1 id="total_students" class="text-3xl font-bold">-</h1>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow">
-                        <p class="text-gray-500">Total Guru</p>
-                        <h1 id="total_instructors" class="text-3xl font-bold">-</h1>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow">
-                        <p class="text-gray-500">Total Mata Pelajaran</p>
-                        <h1 id="total_subjects" class="text-3xl font-bold">-</h1>
-                    </div>
-
-                </div>
-
-
-                <div class="mt-10">
-
-                    <h3 class="text-lg font-semibold mb-4">Jadwal Hari Ini</h3>
-
-                    <div class="bg-white p-6 rounded-xl shadow">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="border-b">
-                                    <th class="pb-3">Mata Pelajaran</th>
-                                    <th class="pb-3">Guru</th>
-                                    <th class="pb-3">Waktu</th>
-                                </tr>
-                            </thead>
-                            <tbody id="schedule_table">
-                                <tr>
-                                    <td colspan="3" class="py-4 text-center text-gray-500">Memuat...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-
+            <div class="card highlight">
+                <h3>Total Guru</h3>
+                <div class="number">{{ $totalGuru }}</div>
             </div>
+            <div class="card highlight">
+                <h3>Kelas Dibuka</h3>
+                <div class="number">{{ $totalKelas }}</div>
+            </div>
+        </div>
 
-        </main>
+        <div class="table-container" style="margin-bottom: 30px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Peringkat</th>
+                        <th>Mata Pelajaran</th>
+                        <th>Guru Pengajar</th>
+                        <th>Jumlah Siswa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($topClasses as $index => $class)
+                    <tr>
+                        <td>#{{ $index + 1 }}</td>
+                        <td style="font-weight: bold; color: #2563eb;">{{ $class->subject->name }}</td>
+                        <td>{{ $class->instructor->fullname }}</td>
+                        <td>
+                            <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 20px; font-weight: 600; font-size: 12px;">
+                                {{ $class->students_count }} Siswa
+                            </span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
+        <h3 class="section-title">Data Lengkap Semua Kelas</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%">Mata Pelajaran</th>
+                        <th width="20%">Guru</th>
+                        <th width="20%">Waktu</th>
+                        <th width="40%">Daftar Siswa Mengambil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($allClasses as $class)
+                    <tr>
+                        <td><strong>{{ $class->subject->name }}</strong></td>
+                        <td>{{ $class->instructor->fullname }}</td>
+                        <td>{{ $class->day }}, {{ $class->time }}</td>
+                        <td>
+                            @if($class->students->isEmpty())
+                                <span style="color: #9ca3af; font-style: italic;">Kosong</span>
+                            @else
+                                <ul class="student-list">
+                                    @foreach($class->students as $student)
+                                        <li>{{ $student->fullname }} ({{ $student->class_grade }})</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <script>
-        async function loadDashboard() {
-
-            try {
-                const base = "http://localhost:8000/api";
-
-                const [students, instructors, subjects, schedule] = await Promise.all([
-                    fetch(base + "/students").then(r => r.json()),
-                    fetch(base + "/instructors").then(r => r.json()),
-                    fetch(base + "/subjects").then(r => r.json()),
-                    fetch(base + "/schedule/today").then(r => r.json()),
-                ]);
-
-                // update angka di card
-                document.getElementById("total_students").textContent = students.total || 0;
-                document.getElementById("total_instructors").textContent = instructors.total || 0;
-                document.getElementById("total_subjects").textContent = subjects.total || 0;
-
-                // update jadwal hari ini
-                const tbody = document.getElementById("schedule_table");
-                tbody.innerHTML = "";
-
-                if (schedule.data && schedule.data.length > 0) {
-                    schedule.data.forEach(item => {
-                        tbody.innerHTML += `
-                            <tr class="border-b">
-                                <td class="py-3">${item.subject}</td>
-                                <td class="py-3">${item.instructor}</td>
-                                <td class="py-3">${item.time_start} - ${item.time_end}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Tidak ada jadwal hari ini</td></tr>`;
-                }
-
-                document.getElementById("user-info").textContent = "Selamat datang, Admin";
-
-            } catch (e) {
-                console.error(e);
-                alert("Gagal memuat data dashboard");
-            }
-        }
-
-        loadDashboard();
-
-        function logout() {
-            alert("Anda telah logout");
-            window.location.href = "login.html";
-        }
-    </script>
 
 </body>
 </html>

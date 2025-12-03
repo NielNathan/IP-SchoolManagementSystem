@@ -2,33 +2,31 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\InstructorController;
 
-// tampilan login n register
-Route::get('/login', [AuthController::class, 'login'])->name('login');
-Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.process');
 
-// logn & register
-Route::post('/login_process', [AuthController::class, 'login_process'])->name('login.process');
-Route::post('/register_process', [AuthController::class, 'register_process'])->name('register.process');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'authenticate'])->name('login.process');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/', function () { 
+    return redirect('/home'); 
+});
 
-// dasbot murid
-Route::get('/student/home', function () {
-    return view('student.home');
-})
-->name('student.home')
-->middleware([\App\Http\Middleware\EnsureRoleStudent::class]);
+Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->group(function () {
+    Route::get('/student-dashboard', [StudentController::class, 'index'])->name('student.index');
+    Route::post('/enroll-course', [StudentController::class, 'enroll'])->name('student.enroll');
+    Route::post('/unenroll-course', [StudentController::class, 'unenroll'])->name('student.unenroll');
+});
 
-// dasbot guru
-Route::get('/teacher/home', function () {
-    return view('teacher.home');
-})
-->name('teacher.home')
-->middleware([\App\Http\Middleware\EnsureRoleTeacher::class]);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/instructor-dashboard', [InstructorController::class, 'index'])->name('instructor.dashboard');
+});
 
-// dasbot admin
-Route::get('/admin/home', function () {
-    return view('admin.home');
-})
-->name('admin.home')
-->middleware([\App\Http\Middleware\EnsureRoleAdmin::class]);
+Route::middleware(['auth', \App\Http\Middleware\EnsureRoleAdmin::class])->group(function () {
+    Route::get('/admin-dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+});
