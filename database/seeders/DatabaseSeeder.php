@@ -78,7 +78,7 @@ class DatabaseSeeder extends Seeder
             'user_id' => $userJames->id,
             'nis' => '20250002',
             'fullname' => 'James Albert Forisa',
-            'class_grade' => 'XI-2'
+            'class_grade' => 'X-2'
         ]);
 
         $allStudents = [$siswaDanelle, $siswaJames];
@@ -86,60 +86,45 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 3. DAFTAR MATA PELAJARAN
         // ==========================================
-        $mapelWajib = [
-            'Pendidikan Agama dan Budi Pekerti',
-            'Pendidikan Pancasila dan Kewarganegaraan',
-            'Bahasa Indonesia',
-            'Bahasa Inggris',
-            'Matematika (Wajib)',
-            'PJOK',
-            'Sejarah',
-        ];
+        $jenjangs = ['X', 'XI', 'XII'];
+        
+        $mapelWajib = ['Pendidikan Agama', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
+        $mapelPilihan = ['Biologi', 'Fisika', 'Ekonomi', 'Sosiologi'];
 
-        // Pilihan (Seni Masuk Sini)
-        $mapelPilihan = [
-            // Seni
-            'Seni Musik', 'Seni Tari', 'Seni Rupa', 'Seni Teater',
-            // MIPA
-            'Biologi', 'Kimia', 'Fisika', 'Matematika Peminatan',
-            // IPS
-            'Sosiologi', 'Ekonomi', 'Geografi',
-            // Lainnya
-            'Bahasa Inggris (Tingkat Lanjut)',
-        ];
-        // ==========================================
-        // 4. PROSES JADWAL & AUTO-ENROLL (SAFE MODE)
-        // ==========================================
+        foreach ($jenjangs as $jenjang) {
+            foreach ($mapelWajib as $m) {
+                $sub = Subject::firstOrCreate(['name' => $m]);
 
-        // --- MAPEL WAJIB ---
-        foreach ($mapelWajib as $namaMapel) {
-            $subject = Subject::create(['name' => $namaMapel]);
+                $sched = Schedule::create([
+                    'subject_id' => $sub->id,
+                    'instructor_id' => $teacherIds[array_rand($teacherIds)],
+                    'grade_level' => $jenjang, 
+                    'day' => 'Senin',
+                    'time_start' => '07:00:00',
+                    'time_end' => '09:00:00',
+                    'quota' => 40
+                ]);
 
-            $schedule = Schedule::create([
-                'subject_id' => $subject->id,
-                'instructor_id' => $teacherIds[array_rand($teacherIds)], 
-                'day' => 'Senin',
-                'time' => '07:00 - 09:00',
-                'quota' => 40
-            ]);
-
-            // Masukkan ke SEMUA siswa dummy (Lama)
-            foreach ($allStudents as $murid) {
-                $murid->schedules()->syncWithoutDetaching([$schedule->id]);
+                foreach ($allStudents as $stu) {
+                    if (str_contains($stu->class_grade, $jenjang)) {
+                        $stu->schedules()->syncWithoutDetaching([$sched->id]);
+                    }
+                }
             }
-        }
 
-        // --- B. MAPEL PILIHAN (JANGAN DI-AUTO ENROLL) ---
-        foreach ($mapelPilihan as $namaMapel) {
-            $subject = Subject::create(['name' => $namaMapel]);
-
-            Schedule::create([
-                'subject_id' => $subject->id,
-                'instructor_id' => $teacherIds[array_rand($teacherIds)],
-                'day' => 'Selasa',
-                'time' => '08:00 - 10:00',
-                'quota' => 30
-            ]);
+            foreach ($mapelPilihan as $m) {
+                $sub = Subject::firstOrCreate(['name' => $m]);
+                
+                Schedule::create([
+                    'subject_id' => $sub->id,
+                    'instructor_id' => $teacherIds[array_rand($teacherIds)],
+                    'grade_level' => $jenjang, 
+                    'day' => 'Selasa',
+                    'time_start' => '10:00:00',
+                    'time_end' => '12:00:00',
+                    'quota' => 30
+                ]);
+            }
         }
 
         // BUAT USER ADMIN

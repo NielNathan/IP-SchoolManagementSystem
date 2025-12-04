@@ -57,7 +57,8 @@
                     <h3>Mata Pelajaran: {{ $class->subject->name }}</h3>
                     
                     <div class="class-info">
-                        Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time }}
+                        Hari: {{ $class->day }} &nbsp;|&nbsp; 
+                        Jam: {{ substr($class->time_start, 0, 5) }} - {{ substr($class->time_end, 0, 5) }}
                     </div>
 
                     <strong>Daftar Siswa ({{ $class->students->count() }} Siswa):</strong>

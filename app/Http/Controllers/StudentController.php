@@ -13,35 +13,28 @@ class StudentController extends Controller
     {
         $user = Auth::user();
         $student = $user->student; 
+        if(!$student) return "Error: Data Profile Siswa tidak ditemukan.";
 
-        if(!$student) {
-            return "Error: Data Profile Siswa tidak ditemukan.";
-        }
+        // --- DETEKSI JENJANG SISWA ---
+        // Misal kelas "XI-1", kita ambil "XI"-nya saja.
+        // Caranya: Ambil kata sebelum tanda strip (-)
+        $studentGradeLevel = explode('-', $student->class_grade)[0]; 
 
-        // 1. DAFTAR NAMA MAPEL WAJIB (Copy dari Seeder/Auth)
-        // Ini digunakan untuk membedakan mana yang boleh dihapus mana yang tidak
-        $wajibTaken = [
-            'Pendidikan Agama dan Budi Pekerti',
-            'Pendidikan Pancasila dan Kewarganegaraan',
-            'Bahasa Indonesia',
-            'Bahasa Inggris',
-            'Matematika (Wajib)',
-            'PJOK',
-            'Sejarah',
-        ];
+        $wajibTaken = ['Pendidikan Agama dan Budi Pekerti', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
 
-        // 2. AMBIL JADWAL SAYA
         $mySchedules = $student->schedules()->with(['subject', 'instructor'])->get();
-
-        // 3. FILTER JADWAL TERSEDIA
         $takenSubjectIds = $mySchedules->pluck('subject_id')->toArray();
-        $allSchedules = Schedule::with(['subject', 'instructor'])
+
+        // --- FILTER JADWAL ---
+        // 1. Bukan jadwal yang sudah diambil
+        // 2. HANYA jadwal yang jenjangnya cocok dengan siswa (grade_level == XI)
+        $allSchedules = \App\Models\Schedule::with(['subject', 'instructor'])
                         ->whereNotIn('subject_id', $takenSubjectIds)
+                        ->where('grade_level', $studentGradeLevel) // <--- FILTER KUNCI
                         ->get();
 
         $totalTaken = $mySchedules->count();
 
-        // Kirim variabel $wajibTaken ke view
         return view('student.home', compact('student', 'allSchedules', 'mySchedules', 'totalTaken', 'wajibTaken'));
     }
 

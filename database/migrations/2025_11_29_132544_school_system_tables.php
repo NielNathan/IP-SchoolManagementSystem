@@ -44,8 +44,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('subject_id')->constrained('subjects');
             $table->foreignId('instructor_id')->constrained('instructors');
+            $table->string('grade_level');
             $table->string('day');
-            $table->string('time');
+            $table->time('time_start');
+            $table->time('time_end');
             $table->integer('quota')->default(30);
             $table->timestamps();
         });

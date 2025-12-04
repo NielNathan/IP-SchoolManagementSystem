@@ -86,7 +86,9 @@
                             @endif
                         </td>
                         <td>{{ $my->instructor->fullname }}</td>
-                        <td>{{ $my->day }}, {{ $my->time }}</td>
+                        <td>{{ $my->day }}, 
+                            {{ substr($my->time_start, 0, 5) }} - {{ substr($my->time_end, 0, 5) }}
+                        </td>
                         <td>
                             @if(in_array($my->subject->name, $wajibTaken))
                                 <span style="color: #9ca3af; font-size: 12px; font-style: italic;">🔒 Terkunci</span>
@@ -119,7 +121,9 @@
                 <tr>
                     <td>{{ $sched->subject->name }}</td>
                     <td>{{ $sched->instructor->fullname }}</td>
-                    <td>{{ $sched->day }}, {{ $sched->time }}</td>
+                    <td>{{ $sched->day }}, 
+                        {{ substr($sched->time_start, 0, 5) }} - {{ substr($sched->time_end, 0, 5) }}
+                    </td>
                     <td>
                         <form action="{{ route('student.enroll') }}" method="POST">
                             @csrf
