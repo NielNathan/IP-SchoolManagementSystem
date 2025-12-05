@@ -57,12 +57,12 @@
                     <h3>Mata Pelajaran: {{ $class->subject->name }}</h3>
                     
                     <div class="class-info">
-                        Hari: {{ $class->day }} &nbsp;|&nbsp; 
-                        Jam: {{ substr($class->time_start, 0, 5) }} - {{ substr($class->time_end, 0, 5) }}
+                        Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time }}
                     </div>
 
                     <strong>Daftar Siswa ({{ $class->students->count() }} Siswa):</strong>
                     <br><br>
+
 
                     @if($class->students->isEmpty())
                         <p class="empty-msg">Belum ada siswa yang mengambil kelas ini.</p>
