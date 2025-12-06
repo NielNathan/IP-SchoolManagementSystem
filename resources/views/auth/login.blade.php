@@ -17,7 +17,7 @@
         p.lead{margin:0 0 18px;color:var(--muted);font-size:14px}
         label{display:block;font-size:13px;margin-bottom:6px;color:#111827}
         input[type=text],input[type=password],input[type=email]{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box}
-        .actions{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+        .actions{display:flex;align-items:center;justify-content:flex-end;margin-top:14px}
         .btn{background:var(--accent);color:white;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
         .btn.secondary{background:#e5e7eb;color:#111827}
         .helper{font-size:13px;color:var(--muted)}
@@ -65,7 +65,6 @@
                 </div>
 
                 <div class="actions">
-                    <label class="remember"><input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Ingat saya</label>
                     <button class="btn" type="submit">Masuk</button>
                 </div>
             </form>

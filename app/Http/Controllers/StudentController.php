@@ -78,4 +78,24 @@ class StudentController extends Controller
 
         return view('student.dashboard', compact('student'));
     }
+
+    // MATERI - Tampilkan Materi dari Mata Pelajaran yang Dipilih
+    public function materi()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return "Error: Data Profile Siswa tidak ditemukan.";
+        }
+
+        // Ambil jadwal yang sudah diambil siswa beserta subject dan materialnya
+        $enrolledSchedules = $student->schedules()
+                                    ->with(['subject' => function($query) {
+                                        $query->with('materials');
+                                    }, 'instructor'])
+                                    ->get();
+
+        return view('student.materi', compact('student', 'enrolledSchedules'));
+    }
 }

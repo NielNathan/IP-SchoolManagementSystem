@@ -241,8 +241,11 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <a href="{{ route('student.index') }}" class="btn btn-primary">
+            <a href="{{ route('student.pilih') }}" class="btn btn-primary">
                 📚 Pilih Mata Pelajaran
+            </a>
+            <a href="{{ route('student.materi') }}" class="btn btn-secondary">
+                📖 Materi Siswa
             </a>
             <button class="btn btn-secondary" onclick="alert('Fitur edit profil akan segera hadir')">
                 ✏️ Edit Profil

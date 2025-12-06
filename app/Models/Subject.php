@@ -9,4 +9,8 @@ class Subject extends Model
     public function schedules() {
         return $this->hasMany(Schedule::class);
     }
+
+    public function materials() {
+        return $this->hasMany(Material::class);
+    }
 }

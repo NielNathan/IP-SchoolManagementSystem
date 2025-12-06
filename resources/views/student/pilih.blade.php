@@ -31,19 +31,6 @@
     @include('partials.header-home')
     
     <div class="container">
-        <div class="header-section">
-            <div>
-                <h1>Halo, {{ $student->fullname }}</h1>
-                <p style="color: #6b7280; margin: 0;">NIS: {{ $student->nis }} | Kelas: {{ $student->class_grade }}</p>
-            </div>
-            
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
 
         <div class="info-box">
             <strong>Total Mata Pelajaran: {{ $totalTaken }} / 12</strong>
