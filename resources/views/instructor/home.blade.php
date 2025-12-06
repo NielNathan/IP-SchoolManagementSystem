@@ -19,6 +19,19 @@
         .logout-btn { background-color: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
         .logout-btn:hover { background-color: #dc2626; }
 
+        .upload-btn { 
+            background-color: #2563eb; 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 13.33px;
+            display: inline-block;
+            border: 1px solid #2563eb;
+        }
+        .upload-btn:hover { background-color: #1d4ed8; }
+
         /* Class Card Style */
         .class-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fff; }
         .class-card h3 { margin: 0 0 10px; color: #2563eb; }
@@ -69,7 +82,12 @@
                 <h1>Halo, {{ $instructor->fullname }}</h1>
                 <p class="subtitle">NIP: {{ $instructor->nip }}</p>
             </div>
-            
+
+            <div class="header-buttons">
+                <a href="/upload-materi" class="upload-btn">
+                    Upload Materi
+                </a>
+            </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">Logout</button>
@@ -85,7 +103,11 @@
         @else
             @foreach($myClasses as $class)
                 <div class="class-card">
-                    <h3>Mata Pelajaran: {{ $class->subject->name }}</h3>
+                    <h3>
+                        {{ $class->subject->name }} 
+                        {{ $class->grade_level }}
+                        </span>
+                    </h3>
                     
                     <div class="class-info">
                         Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time }}
@@ -94,32 +116,28 @@
                     <strong>Daftar Siswa ({{ $class->students->count() }} Siswa):</strong>
                     <br><br>
 
-
                     @if($class->students->isEmpty())
                         <p class="empty-msg">Belum ada siswa yang mengambil kelas ini.</p>
                     @else
-                <ol class="student-list">
-            @foreach($class->students as $student)
-                    <li id="student-row-{{ $student->nis }}-{{ $class->id }}"> 
-            
-            <span>
-                <strong>{{ $student->fullname }}</strong> 
-                (NIS: {{ $student->nis }}) - Kelas {{ $student->class_grade }}
-            </span>
-            
-
-            <button
-                type="button"
-                class="btn-kick"
-                data-nis="{{ $student->nis }}"
-                data-class-id="{{ $class->id }}"
-                data-student-name="{{ $student->fullname }}"
-            >
-                Keluarkan
-            </button>
-                    </li>
-             @endforeach
-                    </ol>
+                        <ol class="student-list">
+                        @foreach($class->students as $student)
+                            <li id="student-row-{{ $student->nis }}-{{ $class->id }}"> 
+                                <span>
+                                    <strong>{{ $student->fullname }}</strong> 
+                                    (NIS: {{ $student->nis }}) - Kelas {{ $student->class_grade }}
+                                </span>
+                                
+                                <button
+                                    type="button"
+                                    class="btn-kick"
+                                    data-nis="{{ $student->nis }}"
+                                    data-class-id="{{ $class->id }}"
+                                    data-student-name="{{ $student->fullname }}"
+                                >
+                                    Keluarkan
+                                </button>
+                            </li>
+                        @endforeach
                         </ol>
                     @endif
                 </div>
@@ -128,51 +146,51 @@
 
     </div>
     <script>
-$   (document).ready(function() {
-    $('.btn-kick').on('click', function() {
-        var button = $(this);
-        var nis = button.data('nis');
-        var classId = button.data('class-id');
-        var studentName = button.data('student-name');
-        
-        if (!confirm('Apakah Anda yakin ingin mengeluarkan siswa ' + studentName + ' dari mata pelajaran ini?')) {
-            return;
-        }
-
-        $.ajax({
-            url: '/instructor/kick-student', 
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}', 
-                nis: nis,
-                class_id: classId 
-            },
-            beforeSend: function() {
-
-                button.text('Loading...').prop('disabled', true);
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert(studentName + ' berhasil dikeluarkan dari kelas!');
-                    
-                
-                    $('#student-row-' + nis + '-' + classId).fadeOut(300, function() {
-                        $(this).remove();
-      
-                    });
-                } else {
-                    alert('Gagal mengeluarkan siswa. ' + (response.message || 'Silakan cek konsol log.'));
-                    button.text('Keluarkan').prop('disabled', false);
-                }
-            },
-            error: function(xhr) {
-                alert('Terjadi kesalahan koneksi atau server.');
-                button.text('Keluarkan').prop('disabled', false);
-                console.log(xhr.responseText); 
+    $(document).ready(function() {
+        $('.btn-kick').on('click', function() {
+            var button = $(this);
+            var nis = button.data('nis');
+            var classId = button.data('class-id');
+            var studentName = button.data('student-name');
+            
+            if (!confirm('Apakah Anda yakin ingin mengeluarkan siswa ' + studentName + ' dari mata pelajaran ini?')) {
+                return;
             }
+
+            $.ajax({
+                url: '/instructor/kick-student', 
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}', 
+                    nis: nis,
+                    class_id: classId 
+                },
+                beforeSend: function() {
+
+                    button.text('Loading...').prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert(studentName + ' berhasil dikeluarkan dari kelas!');
+                        
+                    
+                        $('#student-row-' + nis + '-' + classId).fadeOut(300, function() {
+                            $(this).remove();
+        
+                        });
+                    } else {
+                        alert('Gagal mengeluarkan siswa. ' + (response.message || 'Silakan cek konsol log.'));
+                        button.text('Keluarkan').prop('disabled', false);
+                    }
+                },
+                error: function(xhr) {
+                    alert('Terjadi kesalahan koneksi atau server.');
+                    button.text('Keluarkan').prop('disabled', false);
+                    console.log(xhr.responseText); 
+                }
+            });
         });
     });
-});
 </script>
 </body>
 </html>

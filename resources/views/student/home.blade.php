@@ -116,36 +116,66 @@
                     <th>Aksi</th>
                 </tr>
             </thead>
+
             <tbody>
-                @forelse($allSchedules as $sched)
-                <tr>
-                    <td>{{ $sched->subject->name }}</td>
-                    <td>{{ $sched->instructor->fullname }}</td>
-                    <td>{{ $sched->day }}, 
-                        {{ substr($sched->time_start, 0, 5) }} - {{ substr($sched->time_end, 0, 5) }}
-                    </td>
-                    <td>
-                        <form action="{{ route('student.enroll') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="schedule_id" value="{{ $sched->id }}">
-                            
-                            @if($totalTaken >= 12)
-                                <button type="button" class="btn-action btn-disabled" disabled>Penuh</button>
-                            @else
-                                <button type="submit" class="btn-action btn-add">Ambil</button>
-                            @endif
-                        </form>
-                    </td>
-                </tr>
+                @php
+                    // Ambil jenjang siswa (X, XI, XII)
+                    $studentGradeLevel = explode('-', $student->class_grade)[0];
+
+                    // helper memastikan item selalu Schedule model
+                    $getScheduleModel = function($item) {
+                        return $item instanceof \Illuminate\Support\Collection ? $item->first() : $item;
+                    };
+                @endphp
+
+                @forelse($allSchedules as $item)
+                    @php
+                        $schedule = $getScheduleModel($item);
+                    @endphp
+
+                    @if(!$schedule)
+                        @continue
+                    @endif
+
+                    {{-- Tampil hanya jadwal dengan jenjang yang cocok --}}
+                    @if($schedule->grade_level !== $studentGradeLevel)
+                        @continue
+                    @endif
+
+                    {{-- Skip jadwal yang sudah diambil --}}
+                    @if($mySchedules->contains('id', $schedule->id))
+                        @continue
+                    @endif
+
+                    <tr>
+                        <td>{{ $schedule->subject->name }}</td>
+                        <td>{{ $schedule->instructor->fullname }}</td>
+                        <td>{{ $schedule->day }}, 
+                            {{ substr($schedule->time_start, 0, 5) }} - {{ substr($schedule->time_end, 0, 5) }}
+                        </td>
+                        <td>
+                            <form action="{{ route('student.enroll') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="schedule_id" value="{{ $schedule->id }}">
+
+                                @if($totalTaken >= 12)
+                                    <button type="button" class="btn-action btn-disabled" disabled>Penuh</button>
+                                @else
+                                    <button type="submit" class="btn-action btn-add">Ambil</button>
+                                @endif
+                            </form>
+                        </td>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #6b7280; padding: 20px;">
-                        Tidak ada kelas pilihan lain yang tersedia.
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="4" style="text-align:center; color: #6b7280; padding: 20px;">
+                            Tidak ada kelas pilihan lain yang tersedia.
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
+
 
     </div>
 

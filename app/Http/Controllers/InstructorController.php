@@ -22,6 +22,6 @@ class InstructorController extends Controller
                     ->with(['subject', 'students'])
                     ->get();
 
-        return view('teacher.home', compact('instructor', 'myClasses'));
+        return view('instructor.home', compact('instructor', 'myClasses'));
     }
 }

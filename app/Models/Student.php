@@ -4,7 +4,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
-    protected $guarded = []; // Biar bisa create data bebas
+    protected $fillable = [
+        'user_id',
+        'nis',
+        'fullname',
+        'class_grade', // <- PENTING! Ini nama kolom yg benar
+    ];
 
     // Relasi balik ke User
     public function user() {

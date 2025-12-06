@@ -36,6 +36,13 @@
             font-size: 28px;
             margin: 0;
         }
+
+        /* Container untuk tombol header */
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
         
         .logout-btn {
             background-color: #ef4444;
@@ -49,10 +56,20 @@
             font-size: 14px;
             transition: background-color 0.3s ease;
         }
-        
-        .logout-btn:hover {
-            background-color: #dc2626;
+        .logout-btn:hover { background-color: #dc2626; }
+
+        /* Tombol Materi Baru di Header */
+        .btn-materi-header {
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
         }
+        .btn-materi-header:hover { background-color: #1d4ed8; }
         
         .profile-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -188,7 +205,8 @@
             .header-section h1 { font-size: 22px; }
             .info-grid { grid-template-columns: 1fr; }
             .action-buttons { flex-direction: column; }
-            .btn { width: 100%; }
+            .btn { width: 100%; text-align: center; }
+            .header-buttons { width: 100%; justify-content: space-between; }
         }
     </style>
 </head>
@@ -198,13 +216,19 @@
     <div class="container">
         <div class="header-section">
             <h1>📋 Profil Saya</h1>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
+            
+            <div class="header-buttons">
+                <a href="{{ route('materials.index') }}" class="btn-materi-header">
+                    📚 Materi
+                </a>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Profile Card -->
         <div class="profile-card">
             <div class="profile-image">
                 @if($student->photo)
@@ -217,7 +241,6 @@
             <p>Siswa Aktif</p>
         </div>
 
-        <!-- Info Grid -->
         <div class="info-grid">
             <div class="info-card">
                 <span class="info-card-label">📚 NIS</span>
@@ -239,11 +262,11 @@
 
         <hr class="divider">
 
-        <!-- Action Buttons -->
         <div class="action-buttons">
             <a href="{{ route('student.index') }}" class="btn btn-primary">
-                📚 Pilih Mata Pelajaran
+                📅 Lihat Jadwal & Mapel
             </a>
+            
             <button class="btn btn-secondary" onclick="alert('Fitur edit profil akan segera hadir')">
                 ✏️ Edit Profil
             </button>
