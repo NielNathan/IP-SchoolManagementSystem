@@ -25,6 +25,7 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->grou
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/instructor-dashboard', [InstructorController::class, 'index'])->name('instructor.dashboard');
+    Route::post('/instructor/kick-student', [InstructorController::class, 'kickStudent'])->name('instructor.kick_student');
 });
 
 Route::middleware(['auth', \App\Http\Middleware\EnsureRoleAdmin::class])->group(function () {
