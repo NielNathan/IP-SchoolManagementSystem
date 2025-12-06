@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Schedule;
 use App\Models\Subject;
 
@@ -97,5 +98,65 @@ class StudentController extends Controller
                                     ->get();
 
         return view('student.materi', compact('student', 'enrolledSchedules'));
+    }
+
+    // EDIT PROFILE - Tampilkan Form Edit Profile
+    public function editProfile()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return "Error: Data Profile Siswa tidak ditemukan.";
+        }
+
+        return view('student.edit-profile', compact('student', 'user'));
+    }
+
+    // UPDATE PROFILE - Simpan Perubahan Profile
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return "Error: Data Profile Siswa tidak ditemukan.";
+        }
+
+        // Validasi input
+        $validated = $request->validate([
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        try {
+            // Update data user
+            $user->update([
+                'email' => $validated['email'],
+            ]);
+
+            // Update data student
+            $student->update([
+                'fullname' => $validated['fullname'],
+            ]);
+
+            // Handle upload foto
+            if ($request->hasFile('photo')) {
+                // Hapus foto lama jika ada
+                if ($student->photo && Storage::exists('public/' . $student->photo)) {
+                    Storage::delete('public/' . $student->photo);
+                }
+
+                // Simpan foto baru
+                $path = $request->file('photo')->store('students', 'public');
+                $student->update(['photo' => $path]);
+            }
+
+            return back()->with('success', 'Profil berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
+        }
     }
 }

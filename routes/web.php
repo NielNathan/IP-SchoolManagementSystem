@@ -39,6 +39,8 @@ Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->grou
     })->name('student.pilih');
     Route::get('/student-profile', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/student-materi', [StudentController::class, 'materi'])->name('student.materi');
+    Route::get('/student-edit-profile', [StudentController::class, 'editProfile'])->name('student.edit-profile');
+    Route::put('/student-update-profile', [StudentController::class, 'updateProfile'])->name('student.update-profile');
     Route::post('/enroll-course', [StudentController::class, 'enroll'])->name('student.enroll');
     Route::post('/unenroll-course', [StudentController::class, 'unenroll'])->name('student.unenroll');
 });
