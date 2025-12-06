@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         $jenjangs = ['X', 'XI', 'XII'];
         
-        $mapelWajib = ['Pendidikan Agama', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
+        $mapelWajib = ['Pendidikan Agama dan Budi Pekerti', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
         $mapelPilihan = ['Biologi', 'Fisika', 'Ekonomi', 'Sosiologi'];
 
         foreach ($jenjangs as $jenjang) {

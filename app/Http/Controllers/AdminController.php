@@ -11,10 +11,12 @@ class AdminController extends Controller
 {
     public function index()
     {
+        // --- BAGIAN STATISTIK ---
         $totalSiswa = Student::count();
         $totalGuru = Instructor::count();
         $totalKelas = Schedule::count();
 
+        // --- BAGIAN TOP 5 KELAS ---
         $wajibSubjects = [
             'Pendidikan Agama dan Budi Pekerti',
             'Pendidikan Pancasila dan Kewarganegaraan',
@@ -29,38 +31,41 @@ class AdminController extends Controller
                     ->whereHas('subject', function($query) use ($wajibSubjects) {
                         $query->whereNotIn('name', $wajibSubjects);
                     })
-                    ->withCount('students') 
-                    ->orderByDesc('students_count') 
+                    ->withCount('students')
+                    ->orderByDesc('students_count')
                     ->take(5)
                     ->get();
 
-        $rawSchedules = \App\Models\Schedule::with(['subject', 'instructor', 'students'])->get();
+        // --- BAGIAN UTAMA (PERBAIKAN ERROR & DUPLIKAT) ---
+        
+        // 1. Ambil data mentah sebagai OBJECT (Model)
+        $rawSchedules = Schedule::with(['subject', 'instructor', 'students'])->get();
 
-        // Grouping berdasarkan Mapel + Guru + Hari + Jam (Tanpa Detik)
-        $groupedSchedules = $rawSchedules->groupBy(function($item) {
-            // Ambil jam menit saja (07:00) biar lebih fleksibel
-            $timeStart = substr($item->time_start, 0, 5);
-            return $item->subject_id . '-' . $item->instructor_id . '-' . $item->day . '-' . $timeStart;
-        });
+        // 2. Lakukan Grouping di sini agar baris tidak dobel-dobel
+        // Kunci Grouping: ID Mapel - ID Guru - Hari - Jam (07:00)
+        $groupedSchedules = $rawSchedules->groupBy('subject_id');
 
-        // Mapping ulang
         $allClasses = $groupedSchedules->map(function($group) {
+
             $representative = $group->first();
 
-            // Gabungkan siswa dari semua jenjang, TAPI HANYA AMBIL YANG UNIK
-            $mergedStudents = $group->flatMap(function($schedule) {
-                return $schedule->students;
-            })->unique('id'); // <--- INI PERBAIKAN PENTINGNYA (Hapus Duplikat Siswa)
+            // Gabung guru
+            $mergedInstructors = $group->map(function($item){
+                return $item->instructor;
+            })->unique('id')->values();
 
-            // Masukkan kembali ke relasi
-            $representative->setRelation('students', $mergedStudents);
+            // Gabung siswa
+            $mergedStudents = $group->flatMap->students->unique('id')->values();
 
-            // Kita simpan info jenjang apa saja yang ada di grup ini (opsional, buat display)
-            $representative->all_grades = $group->pluck('grade_level')->unique()->implode(', ');
+            // Ambil waktu dan hari pertama (boleh di-custom nanti)
+            $representative->multi_instructors = $mergedInstructors;
+            $representative->multi_students = $mergedStudents;
 
             return $representative;
-        })->values(); // Reset key array biar urut
 
+        })->values();
+
+        // Kirim ke View (Data $allClasses sekarang berisi OBJECT bersih)
         return view('admin.home', compact('totalSiswa', 'totalGuru', 'totalKelas', 'topClasses', 'allClasses'));
     }
 }

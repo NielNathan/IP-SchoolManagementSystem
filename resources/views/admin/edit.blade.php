@@ -35,7 +35,6 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="header">
             <div>
@@ -49,6 +48,13 @@
             <div style="background: #d1fae5; color: #065f46; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
                 {{ session('success') }}
             </div>
+        @endif
+
+        @if(session('error'))
+            <script>alert("{{ session('error') }}");</script>
+        @endif
+        @if(session('success'))
+            <script>alert("{{ session('success') }}");</script>
         @endif
 
         <div class="table-container">
@@ -73,14 +79,16 @@
                         <td>{{ substr($sched->time_start, 0, 5) }} - {{ substr($sched->time_end, 0, 5) }}</td>
                         <td>
                             <button class="btn btn-edit" onclick="openEditModal(
-                                {{ $sched->id }}, 
-                                '{{ $sched->subject->name }}', 
+                                {{ $sched->id }},
+                                '{{ $sched->subject->name }}',
                                 '{{ $sched->instructor_id }}',
-                                '{{ $sched->grade_level }}' 
-                                '{{ $sched->day }}', 
-                                '{{ $sched->time_start }}', 
+                                '{{ $sched->grade_level }}',
+                                '{{ $sched->day }}',
+                                '{{ $sched->time_start }}',
                                 '{{ $sched->time_end }}'
-                            )">Edit</button>
+                            )">
+                                Edit
+                            </button>
 
                             <form action="{{ route('admin.schedules.destroy', $sched->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin hapus jadwal ini?');">
                                 @csrf
@@ -117,7 +125,8 @@
                 </div>
                 <div class="form-group">
                     <label>Jenjang Kelas</label>
-                    <select name="grade_level" id="edit_grade_level" required> <option value="X">Kelas X</option>
+                    <select name="grade_level" id="edit_grade_level" required> 
+                        <option value="X">Kelas X</option>
                         <option value="XI">Kelas XI</option>
                         <option value="XII">Kelas XII</option>
                     </select>
@@ -170,7 +179,8 @@
                 </div>
                 <div class="form-group">
                     <label>Jenjang Kelas</label>
-                    <select name="grade_level" id="edit_grade_level" required> <option value="X">Kelas X</option>
+                    <select name="grade_level" id="edit_grade_level" required> 
+                        <option value="X">Kelas X</option>
                         <option value="XI">Kelas XI</option>
                         <option value="XII">Kelas XII</option>
                     </select>
@@ -203,17 +213,15 @@
     <script>
         function openCreateModal() { document.getElementById('createModal').style.display = 'block'; }
         
-        // Fungsi canggih untuk mengisi data Edit otomatis
-        function openEditModal(id, subjectName, instructorId, day, start, end, grade) {
+        function openEditModal(id, subjectName, instructorId, grade, day, start, end) {
+
             document.getElementById('editModal').style.display = 'block';
             
-            // Set URL Action Form
-            document.getElementById('editForm').action = '/admin/schedules/' + id;
-            
-            // Isi Value Input
+            document.getElementById('editForm').action = '/admin/edit/' + id;
+
             document.getElementById('edit_subject_name').value = subjectName;
             document.getElementById('edit_instructor_id').value = instructorId;
-            document.getElementById('edit_grade_level').value = grade;
+            document.getElementById('edit_grade_level').value = grade_level;
             document.getElementById('edit_day').value = day;
             document.getElementById('edit_time_start').value = start;
             document.getElementById('edit_time_end').value = end;

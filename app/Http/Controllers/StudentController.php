@@ -41,8 +41,7 @@ class StudentController extends Controller
     public function enroll(Request $request)
     {
         $student = Auth::user()->student;
-        
-        // UPDATE: BATAS MAKSIMAL JADI 12
+
         if ($student->schedules()->count() >= 12) {
             return back()->with('error', 'Batas maksimum 12 mata pelajaran telah tercapai!');
         }
