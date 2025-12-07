@@ -33,6 +33,7 @@ Route::middleware(['auth', EnsureRoleTeacher::class])->group(function () {
     Route::get('/instructor-dashboard', [InstructorController::class, 'index'])->name('instructor.dashboard');
     Route::get('/upload-materi', [MaterialController::class, 'create'])->name('materials.create');
     Route::post('/upload-materi', [MaterialController::class, 'store'])->name('materials.store');
+    Route::post('/instructor/kick-student', [InstructorController::class, 'kickStudent'])->name('instructor.kick_student');
 });
 
 Route::middleware(['auth', EnsureRoleAdmin::class])->group(function () {

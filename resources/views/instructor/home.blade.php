@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard Guru - IP School</title>
@@ -19,19 +22,6 @@
         .logout-btn { background-color: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
         .logout-btn:hover { background-color: #dc2626; }
 
-        .upload-btn { 
-            background-color: #2563eb; 
-            color: white; 
-            text-decoration: none; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            font-size: 13.33px;
-            display: inline-block;
-            border: 1px solid #2563eb;
-        }
-        .upload-btn:hover { background-color: #1d4ed8; }
-
         /* Class Card Style */
         .class-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fff; }
         .class-card h3 { margin: 0 0 10px; color: #2563eb; }
@@ -42,35 +32,35 @@
         .student-list li { margin-bottom: 5px; color: #4b5563; }
         .empty-msg { color: #9ca3af; font-style: italic; }
 
-        /* Tambahkan CSS ini di dalam tag <style> Anda */
-
+        /* --- STYLING BARU UNTUK TOMBOL KELUARKAN SISWA --- */
+        
         /* Student List Styling: Memastikan nama siswa dan tombol sebaris */
         .student-list li {
-        display: flex; /* Mengaktifkan Flexbox */
-        justify-content: space-between; /* Memisahkan konten (nama vs tombol) */
-        align-items: center;
-        margin-bottom: 8px; /* Tambahkan sedikit jarak antar siswa */
-        padding-right: 10px; /* Jarak dari tepi kanan kartu */
-}
+            display: flex; /* Mengaktifkan Flexbox */
+            justify-content: space-between; /* Memisahkan konten (nama vs tombol) */
+            align-items: center;
+            margin-bottom: 8px; /* Tambahkan sedikit jarak antar siswa */
+            padding-right: 10px; /* Jarak dari tepi kanan kartu */
+        }
 
         /* Kick Button Styling */
         .btn-kick { 
-         background-color: #ef4444; /* Merah (sama dengan Logout) */
-         color: white;
-         border: none;
-         padding: 4px 10px;
-         border-radius: 4px;
-         cursor: pointer;
-         font-weight: 600;
-         font-size: 12px; /* Membuat tombol kecil */
-         margin-left: 15px; /* Jarak dari nama siswa */
-         transition: background-color 0.2s;
-         flex-shrink: 0; /* Mencegah tombol menyusut */
-}
+            background-color: #ef4444; /* Merah (sama dengan Logout) */
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px; /* Membuat tombol kecil */
+            margin-left: 15px; /* Jarak dari nama siswa */
+            transition: background-color 0.2s;
+            flex-shrink: 0; /* Mencegah tombol menyusut */
+        }
 
         .btn-kick:hover {
-         background-color: #dc2626;
-}
+            background-color: #dc2626;
+        }
     </style>
 </head>
 <body>
@@ -82,12 +72,7 @@
                 <h1>Halo, {{ $instructor->fullname }}</h1>
                 <p class="subtitle">NIP: {{ $instructor->nip }}</p>
             </div>
-
-            <div class="header-buttons">
-                <a href="/upload-materi" class="upload-btn">
-                    Upload Materi
-                </a>
-            </div>
+            
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">Logout</button>
@@ -103,11 +88,7 @@
         @else
             @foreach($myClasses as $class)
                 <div class="class-card">
-                    <h3>
-                        {{ $class->subject->name }} 
-                        {{ $class->grade_level }}
-                        </span>
-                    </h3>
+                    <h3>Mata Pelajaran: {{ $class->subject->name }}</h3>
                     
                     <div class="class-info">
                         Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time }}
@@ -116,28 +97,30 @@
                     <strong>Daftar Siswa ({{ $class->students->count() }} Siswa):</strong>
                     <br><br>
 
+
                     @if($class->students->isEmpty())
                         <p class="empty-msg">Belum ada siswa yang mengambil kelas ini.</p>
                     @else
                         <ol class="student-list">
-                        @foreach($class->students as $student)
-                            <li id="student-row-{{ $student->nis }}-{{ $class->id }}"> 
-                                <span>
-                                    <strong>{{ $student->fullname }}</strong> 
-                                    (NIS: {{ $student->nis }}) - Kelas {{ $student->class_grade }}
-                                </span>
-                                
-                                <button
-                                    type="button"
-                                    class="btn-kick"
-                                    data-nis="{{ $student->nis }}"
-                                    data-class-id="{{ $class->id }}"
-                                    data-student-name="{{ $student->fullname }}"
-                                >
-                                    Keluarkan
-                                </button>
-                            </li>
-                        @endforeach
+                            @foreach($class->students as $student)
+                                <li id="student-row-{{ $student->nis }}-{{ $class->id }}"> 
+                                    
+                                    <span>
+                                        <strong>{{ $student->fullname }}</strong> 
+                                        (NIS: {{ $student->nis }}) - Kelas {{ $student->class_grade }}
+                                    </span>
+                                    
+                                    <button
+                                        type="button"
+                                        class="btn-kick"
+                                        data-nis="{{ $student->nis }}"
+                                        data-class-id="{{ $class->id }}"
+                                        data-student-name="{{ $student->fullname }}"
+                                    >
+                                        Keluarkan
+                                    </button>
+                                </li>
+                            @endforeach
                         </ol>
                     @endif
                 </div>
@@ -145,6 +128,7 @@
         @endif
 
     </div>
+    
     <script>
     $(document).ready(function() {
         $('.btn-kick').on('click', function() {
@@ -153,44 +137,91 @@
             var classId = button.data('class-id');
             var studentName = button.data('student-name');
             
-            if (!confirm('Apakah Anda yakin ingin mengeluarkan siswa ' + studentName + ' dari mata pelajaran ini?')) {
-                return;
-            }
-
-            $.ajax({
-                url: '/instructor/kick-student', 
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}', 
-                    nis: nis,
-                    class_id: classId 
-                },
-                beforeSend: function() {
-
-                    button.text('Loading...').prop('disabled', true);
-                },
-                success: function(response) {
-                    if (response.success) {
-                        alert(studentName + ' berhasil dikeluarkan dari kelas!');
-                        
+            // 1. Ganti Konfirmasi standar dengan SweetAlert2
+            Swal.fire({
+                title: 'Konfirmasi Pengeluaran Siswa',
+                html: 'Apakah Anda yakin ingin mengeluarkan **' + studentName + '** (NIS: ' + nis + ') dari mata pelajaran ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3741',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Keluarkan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     
-                        $('#student-row-' + nis + '-' + classId).fadeOut(300, function() {
-                            $(this).remove();
-        
-                        });
-                    } else {
-                        alert('Gagal mengeluarkan siswa. ' + (response.message || 'Silakan cek konsol log.'));
-                        button.text('Keluarkan').prop('disabled', false);
-                    }
-                },
-                error: function(xhr) {
-                    alert('Terjadi kesalahan koneksi atau server.');
-                    button.text('Keluarkan').prop('disabled', false);
-                    console.log(xhr.responseText); 
+                    // Tampilkan SweetAlert loading sebelum request
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Permintaan sedang dikirim ke server. Mohon tunggu.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Matikan tombol sementara
+                    button.prop('disabled', true);
+                    
+                    // Lakukan permintaan AJAX
+                    $.ajax({
+                        url: '{{ route('instructor.kick_student') }}', // Menggunakan helper route Laravel
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            nis: nis,
+                            class_id: classId 
+                        },
+                        success: function(response) {
+                            Swal.close(); // Tutup loading SwAL
+                            button.prop('disabled', false);
+                            
+                            if (response.success) {
+                                // SweetAlert2 Notifikasi Sukses
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message || studentName + ' berhasil dikeluarkan dari kelas!'
+                                });
+                                
+                                // Hapus elemen daftar siswa (li) dari DOM
+                                $('#student-row-' + nis + '-' + classId).fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                                
+                            } else {
+                                // SweetAlert2 Notifikasi Gagal
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: response.message || 'Terjadi kesalahan saat mengeluarkan siswa.'
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.close(); // Tutup loading SwAL
+                            button.prop('disabled', false).text('Keluarkan');
+                            
+                            // SweetAlert2 Notifikasi Error Koneksi/Server
+                            var errorMessage = 'Terjadi kesalahan koneksi atau server.';
+                            if (xhr.status === 403) {
+                                errorMessage = 'Otorisasi ditolak. Anda tidak berhak mengeluarkan siswa dari kelas ini.';
+                            } else if (xhr.status === 404) {
+                                errorMessage = 'Gagal: Siswa tidak ditemukan atau jadwal tidak valid.';
+                            }
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: errorMessage + ' (Status: ' + xhr.status + ').'
+                            });
+                            console.log(xhr.responseText);
+                        }
+                    });
                 }
             });
         });
     });
-</script>
+    </script>
 </body>
 </html>
