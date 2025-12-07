@@ -88,6 +88,9 @@
             </div>
             
             <div class="header-actions">
+                <a href="{{ route('instructor.materials.index') }}" class="upload-btn" style="background-color: #764ba2;">
+                    📚 Kelola Materi
+                </a>
                 <a href="{{ route('materials.create') }}" class="upload-btn">
                     📤 Upload Materi
                 </a>

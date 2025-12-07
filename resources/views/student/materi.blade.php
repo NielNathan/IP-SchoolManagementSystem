@@ -160,42 +160,38 @@
             <div class="subject-section">
                 <div class="subject-header">
                     <h2>{{ $schedule->subject->name }}</h2>
+                    <p>Pengajar: {{ $schedule->instructor->fullname ?? '-' }}</p>
                 </div>
 
-                @if($schedule->subject->materials && count($schedule->subject->materials) > 0)
+                @if(isset($schedule->materials) && count($schedule->materials) > 0)
                     <div class="materials-grid">
-                        @foreach($schedule->subject->materials as $material)
+                        @foreach($schedule->materials as $material)
                             <div class="material-card">
                                 <div class="material-icon">
-                                    @switch($material->type ?? 'document')
-                                        @case('video')
-                                            🎬
-                                        @break
-                                        @case('pdf')
-                                            📄
-                                        @break
-                                        @case('image')
-                                            🖼️
-                                        @break
-                                        @default
-                                            📋
-                                    @endswitch
+                                    @php
+                                        $ext = strtolower(pathinfo($material->file_path, PATHINFO_EXTENSION));
+                                        $icon = match($ext) {
+                                            'pdf' => '📄',
+                                            'jpg', 'jpeg', 'png', 'gif' => '🖼️',
+                                            'mp4', 'avi', 'mov' => '🎬',
+                                            'doc', 'docx' => '📝',
+                                            'xls', 'xlsx' => '📊',
+                                            'ppt', 'pptx' => '🎯',
+                                            default => '📋'
+                                        };
+                                    @endphp
+                                    {{ $icon }}
                                 </div>
                                 <div class="material-title">{{ $material->title }}</div>
-                                <div class="material-description">{{ Str::limit($material->description, 80) }}</div>
                                 
                                 <div class="material-meta">
                                     <span>📅 {{ \Carbon\Carbon::parse($material->created_at)->format('d M Y') }}</span>
-                                    @if($material->file_url)
-                                        <span>📦 {{ \Illuminate\Support\Str::afterLast($material->file_url, '.') }}</span>
-                                    @endif
+                                    <span>📦 {{ strtoupper($ext) }}</span>
                                 </div>
 
-                                @if($material->file_url)
-                                    <a href="{{ $material->file_url }}" target="_blank" class="download-btn">
-                                        ⬇️ Download
-                                    </a>
-                                @endif
+                                <a href="{{ route('materials.show', $material->id) }}" class="download-btn" download>
+                                    ⬇️ Download
+                                </a>
                             </div>
                         @endforeach
                     </div>

@@ -131,13 +131,30 @@ class StudentController extends Controller
 
         if (!$student) return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
 
+        // Ambil jenjang kelas siswa (misal "XI" dari "XI-1")
+        $gradeLevel = explode('-', $student->class_grade)[0];
+
+        // Ambil jadwal siswa
         $rawSchedules = $student->schedules()
-            ->with(['subject.materials', 'instructor'])
+            ->with('subject')
             ->get();
 
-        $enrolledSchedules = $rawSchedules->unique(function($item) {
-            return strtolower(preg_replace('/\s+/', '', $item->subject->name));
+        // Untuk setiap schedule, load materi yang sesuai grade_level
+        $schedules = $rawSchedules->map(function($schedule) use ($gradeLevel) {
+            $materials = \App\Models\Material::where('subject_id', $schedule->subject->id)
+                ->where('grade_level', $gradeLevel)
+                ->latest()
+                ->get();
+            
+            // Tambahkan materials sebagai property temporary
+            $schedule->materials = $materials;
+            return $schedule;
         });
+
+        // Filter unik berdasarkan subject
+        $enrolledSchedules = $schedules->unique(function($item) {
+            return strtolower(preg_replace('/\s+/', '', $item->subject->name));
+        })->values();
 
         return view('student.materi', compact('enrolledSchedules'));
     }

@@ -101,4 +101,123 @@ class MaterialController extends Controller
 
         return response()->file($path);
     }
+
+
+
+    // =========================================================================
+    // BAGIAN GURU (KELOLA MATERI - LIST, EDIT, DELETE)
+    // =========================================================================
+    
+    // Tampilkan daftar materi yang diupload guru
+    public function myMaterials()
+    {
+        if (!Auth::user()->instructor) {
+            abort(403, 'Akses ditolak. Halaman ini khusus Guru.');
+        }
+
+        $instructorId = Auth::user()->instructor->id;
+        $materials = Material::where('instructor_id', $instructorId)
+                            ->with(['subject'])
+                            ->latest()
+                            ->get();
+
+        return view('instructor.materials.index', compact('materials'));
+    }
+
+    // Tampilkan form edit materi
+    public function editMaterial($id)
+    {
+        if (!Auth::user()->instructor) {
+            abort(403, 'Akses ditolak. Halaman ini khusus Guru.');
+        }
+
+        $material = Material::findOrFail($id);
+
+        // Pastikan guru hanya bisa edit materi miliknya sendiri
+        if ($material->instructor_id !== Auth::user()->instructor->id) {
+            abort(403, 'Anda tidak memiliki akses ke materi ini.');
+        }
+
+        $instructorId = Auth::user()->instructor->id;
+        $subjects = Schedule::where('instructor_id', $instructorId)
+                            ->with('subject')
+                            ->get()
+                            ->pluck('subject')
+                            ->unique('id');
+
+        $grades = Schedule::where('instructor_id', $instructorId)
+                            ->select('grade_level')
+                            ->distinct()
+                            ->orderBy('grade_level')
+                            ->pluck('grade_level');
+
+        return view('instructor.materials.edit', compact('material', 'subjects', 'grades'));
+    }
+
+    // Update materi
+    public function updateMaterial(Request $request, $id)
+    {
+        if (!Auth::user()->instructor) {
+            abort(403, 'Akses ditolak. Halaman ini khusus Guru.');
+        }
+
+        $material = Material::findOrFail($id);
+
+        if ($material->instructor_id !== Auth::user()->instructor->id) {
+            abort(403, 'Anda tidak memiliki akses ke materi ini.');
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'subject_id' => 'required',
+            'grade_level' => 'required',
+            'file' => 'nullable|mimes:pdf,jpg,png,doc,docx,ppt,pptx|max:10000',
+        ]);
+
+        $updateData = [
+            'title' => $request->title,
+            'subject_id' => $request->subject_id,
+            'grade_level' => $request->grade_level,
+        ];
+
+        // Jika ada file baru, hapus file lama dan simpan yang baru
+        if ($request->file('file')) {
+            // Hapus file lama
+            if ($material->file_path && Storage::exists('public/' . $material->file_path)) {
+                Storage::delete('public/' . $material->file_path);
+            }
+
+            // Simpan file baru
+            $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
+            $path = $request->file('file')->storeAs('materials', $fileName, 'public');
+            $updateData['file_path'] = $path;
+        }
+
+        $material->update($updateData);
+
+        return redirect()->route('instructor.materials.index')->with('success', 'Materi berhasil diperbarui!');
+    }
+
+    // Hapus materi
+    public function deleteMaterial($id)
+    {
+        if (!Auth::user()->instructor) {
+            abort(403, 'Akses ditolak. Halaman ini khusus Guru.');
+        }
+
+        $material = Material::findOrFail($id);
+
+        if ($material->instructor_id !== Auth::user()->instructor->id) {
+            abort(403, 'Anda tidak memiliki akses ke materi ini.');
+        }
+
+        // Hapus file
+        if ($material->file_path && Storage::exists('public/' . $material->file_path)) {
+            Storage::delete('public/' . $material->file_path);
+        }
+
+        $material->delete();
+
+        return back()->with('success', 'Materi berhasil dihapus!');
+    }
 }

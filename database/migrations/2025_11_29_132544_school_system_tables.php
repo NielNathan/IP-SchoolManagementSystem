@@ -65,10 +65,10 @@ return new class extends Migration
             $table->id();
             $table->string('title'); // Judul Materi
             $table->string('file_path'); // Lokasi file disimpan
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // Mata Pelajaran apa
-            $table->foreignId('instructor_id')->constrained()->onDelete('cascade'); // Siapa guru yang upload
+            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); // Mata Pelajaran apa
+            $table->foreignId('instructor_id')->constrained('instructors')->onDelete('cascade'); // Siapa guru yang upload
             $table->timestamps();
-    });
+        });
     }
 
     public function down()
