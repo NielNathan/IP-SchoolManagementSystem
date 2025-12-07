@@ -159,4 +159,26 @@ class StudentController extends Controller
             return back()->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
         }
     }
+
+    // PILIH - Tampilkan halaman untuk memilih mata pelajaran
+    public function pilih()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+        if (!$student) return "Error: Data Profile Siswa tidak ditemukan.";
+
+        $studentGradeLevel = explode('-', $student->class_grade)[0];
+        $wajibTaken = ['Pendidikan Agama dan Budi Pekerti', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
+        $mySchedules = $student->schedules()->with(['subject', 'instructor'])->get();
+        $takenSubjectIds = $mySchedules->pluck('subject_id')->toArray();
+
+        $allSchedules = Schedule::with(['subject', 'instructor'])
+                        ->whereNotIn('subject_id', $takenSubjectIds)
+                        ->where('grade_level', $studentGradeLevel)
+                        ->get();
+
+        $totalTaken = $mySchedules->count();
+
+        return view('student.pilih', compact('student', 'allSchedules', 'mySchedules', 'totalTaken', 'wajibTaken'));
+    }
 }

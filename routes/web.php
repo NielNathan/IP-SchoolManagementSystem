@@ -18,25 +18,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->group(function () {
     Route::get('/student-pilihmapel', [StudentController::class, 'index'])->name('student.index');
-    Route::get('/student-pilih', function () { 
-        $user = \Illuminate\Support\Facades\Auth::user();
-        $student = $user->student; 
-        if(!$student) return "Error: Data Profile Siswa tidak ditemukan.";
-        
-        $studentGradeLevel = explode('-', $student->class_grade)[0]; 
-        $wajibTaken = ['Pendidikan Agama dan Budi Pekerti', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
-        $mySchedules = $student->schedules()->with(['subject', 'instructor'])->get();
-        $takenSubjectIds = $mySchedules->pluck('subject_id')->toArray();
-        
-        $allSchedules = \App\Models\Schedule::with(['subject', 'instructor'])
-                        ->whereNotIn('subject_id', $takenSubjectIds)
-                        ->where('grade_level', $studentGradeLevel)
-                        ->get();
-        
-        $totalTaken = $mySchedules->count();
-        
-        return view('student.pilih', compact('student', 'allSchedules', 'mySchedules', 'totalTaken', 'wajibTaken'));
-    })->name('student.pilih');
+    Route::get('/student-pilih', [StudentController::class, 'pilih'])->name('student.pilih');
     Route::get('/student-profile', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/student-materi', [StudentController::class, 'materi'])->name('student.materi');
     Route::get('/student-edit-profile', [StudentController::class, 'editProfile'])->name('student.edit-profile');
