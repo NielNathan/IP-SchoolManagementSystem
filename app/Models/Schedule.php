@@ -4,7 +4,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'subject_id',
+        'instructor_id',
+        'grade_level', // <- yang benar
+        'day',
+        'time_start',
+        'time_end',
+        'quota',
+    ];
 
     // Relasi-relasi penting
     public function subject() {

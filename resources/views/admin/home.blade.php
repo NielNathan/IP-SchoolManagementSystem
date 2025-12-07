@@ -9,10 +9,8 @@
         body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         
-        /* Header */
+        /* Header & Stats */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-
-        /* Stats Cards */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .card h3 { margin: 0; color: #6b7280; font-size: 14px; text-transform: uppercase; }
@@ -25,62 +23,22 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
         th { background-color: #f9fafb; font-weight: 600; color: #374151; }
-
-        /* Tombol Lihat Detail */
-        .btn-view {
-            background-color: #3b82f6; color: white; border: none; padding: 6px 12px;
-            border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;
-        }
+        .btn-view { background-color: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
         .btn-view:hover { background-color: #2563eb; }
 
-        /* --- GAYA POP-UP (MODAL) --- */
-        .modal {
-            display: none; /* Sembunyi secara default */
-            position: fixed; 
-            z-index: 1000; 
-            left: 0; top: 0;
-            width: 100%; height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.5); /* Latar belakang gelap transparan */
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto; /* Posisi di tengah */
-            padding: 25px;
-            border: 1px solid #888;
-            width: 90%; max-width: 500px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: slideDown 0.3s ease-out;
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: slideDown 0.3s ease-out; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .modal-title { font-weight: 700; font-size: 18px; color: #1f2937; }
         .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-btn:hover { color: #000; }
-        
         .student-list-modal { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; }
         .student-list-modal li { padding: 10px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; }
-        .student-list-modal li:last-child { border-bottom: none; }
+        .grade-divider { background: #f3f4f6; color: #374151; font-weight: 700; font-size: 12px; padding: 8px 12px; margin-top: 15px; margin-bottom: 5px; border-radius: 6px; border-left: 4px solid #2563eb; letter-spacing: 0.5px; }
         .badge-kelas { background: #e5e7eb; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-
-        .grade-divider {
-            background: #f3f4f6;
-            color: #374151;
-            font-weight: 700;
-            font-size: 12px;
-            padding: 8px 12px;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            border-radius: 6px;
-            border-left: 4px solid #2563eb;
-            letter-spacing: 0.5px;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -90,19 +48,12 @@
         <div class="header">
             <h1>🛡️ Administrator Panel</h1>
             <div style="display: flex; gap: 10px;">
-                <a href="{{ route('admin.schedules.index') }}" 
-                    style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #2563eb; justify-content: center; align-items: center; display: flex;">
-                    Edit Jadwal
-                </a>
-
+                <a href="{{ route('admin.schedules.index') }}" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #2563eb; justify-content: center; align-items: center; display: flex;">Edit Jadwal</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit"
-                        style="background-color: #ef4444; color: white; padding: 12px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #ef4444; justify-content: center; align-items: center; display: flex;">
-                        Logout
-                    </button>
+                    <button type="submit" style="background-color: #ef4444; color: white; padding: 12px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #ef4444; justify-content: center; align-items: center; display: flex;">Logout</button>
                 </form>
-    </div>
+            </div>
         </div>
 
         <div class="stats-grid">
@@ -122,25 +73,14 @@
 
         <div class="table-container" style="margin-bottom: 30px;">
             <table>
-                <thead>
-                    <tr>
-                        <th>Peringkat</th>
-                        <th>Mata Pelajaran Pilihan</th>
-                        <th>Guru Pengajar</th>
-                        <th>Jumlah Siswa</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Peringkat</th><th>Mata Pelajaran Pilihan</th><th>Guru Pengajar</th><th>Jumlah Siswa</th></tr></thead>
                 <tbody>
                     @foreach($topClasses as $index => $class)
                     <tr>
                         <td>#{{ $index + 1 }}</td>
-                        <td style="font-weight: bold; color: #2563eb;">{{ $class->subject->name }}</td>
-                        <td>{{ $class->instructor->fullname }}</td>
-                        <td>
-                            <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 20px; font-weight: 600; font-size: 12px;">
-                                {{ $class->students_count }} Siswa
-                            </span>
-                        </td>
+                        <td style="font-weight: bold; color: #2563eb;">{{ $class->subject->name ?? '-' }}</td>
+                        <td>{{ $class->instructor->fullname ?? '-' }}</td>
+                        <td><span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 20px; font-weight: 600; font-size: 12px;">{{ $class->students_count }} Siswa</span></td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -162,9 +102,13 @@
                 <tbody>
                     @foreach($allClasses as $class)
                     <tr>
-                        <td><strong>{{ $class->subject->name }}</strong></td>
-                        <td>{{ $class->instructor->fullname }}</td>
-                        <td>{{ $class->day }}, 
+                        <td><strong>{{ $class->subject->name ?? '-' }}</strong></td>
+                        <td>@foreach($class->multi_instructors as $guru)
+                                {{ $guru->fullname }}<br>
+                            @endforeach
+                        </td>
+                        <td>
+                            {{ $class->day }}, 
                             {{ substr($class->time_start, 0, 5) }} - {{ substr($class->time_end, 0, 5) }}
                         </td>
                         <td>{{ $class->students->count() }} Siswa</td>
@@ -180,28 +124,25 @@
     <div id="modal-{{ $class->id }}" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">{{ $class->subject->name }}</div>
+                <div class="modal-title">{{ $class->subject->name ?? 'Detail' }}</div>
                 <span class="close-btn" onclick="closeModal('modal-{{ $class->id }}')">&times;</span>
             </div>
             
-            <p style="margin-top: 0; color: #6b7280; font-size: 13px;">Pengajar: {{ $class->instructor->fullname }}</p>
+            <p style="margin-top: 0; color: #6b7280; font-size: 13px;">Pengajar: {{ $class->instructor->fullname ?? '-' }}</p>
             <hr style="border:0; border-top:1px solid #eee; margin: 10px 0;">
 
             <ul class="student-list-modal">
                 @if($class->students->isEmpty())
-                    <li style="justify-content: center; color: #9ca3af; font-style: italic;">
-                        Belum ada siswa di kelas ini.
-                    </li>
+                    <li style="justify-content: center; color: #9ca3af; font-style: italic;">Belum ada siswa di kelas ini.</li>
                 @else
                     <?php
-                        $groupedStudents = $class->students->sortBy('class_grade')->groupBy(function($item) {
-                            return explode('-', $item->class_grade)[0];
+                        // Grouping tampilan siswa per jenjang
+                        $groupedStudents = $class->students->sortBy('class_grade')->groupBy(function($s) {
+                            return explode('-', $s->class_grade)[0];
                         });
                     ?>
-
                     @foreach($groupedStudents as $level => $students)
                         <div class="grade-divider">SISWA KELAS {{ $level }}</div>
-
                         @foreach($students as $student)
                             <li>
                                 <span>{{ $student->fullname }} <small style="color:#888">({{ $student->nis }})</small></span>
@@ -216,9 +157,9 @@
     @endforeach
 
     <script>
-        function openModal(modalId) { document.getElementById(modalId).style.display = "block"; document.body.style.overflow = "hidden"; }
-        function closeModal(modalId) { document.getElementById(modalId).style.display = "none"; document.body.style.overflow = "auto"; }
-        window.onclick = function(event) { if (event.target.classList.contains('modal')) { event.target.style.display = "none"; document.body.style.overflow = "auto"; } }
+        function openModal(id) { document.getElementById(id).style.display = "block"; document.body.style.overflow = "hidden"; }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; document.body.style.overflow = "auto"; }
+        window.onclick = function(e) { if (e.target.classList.contains('modal')) { e.target.style.display = "none"; document.body.style.overflow = "auto"; } }
     </script>
 </body>
 </html>

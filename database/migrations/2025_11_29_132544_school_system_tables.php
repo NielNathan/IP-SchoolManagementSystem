@@ -60,6 +60,15 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['student_id', 'schedule_id']); // Gaboleh ambil kelas sama 2x
         });
+
+        Schema::create('materials', function (Blueprint $table) {
+            $table->id();
+            $table->string('title'); // Judul Materi
+            $table->string('file_path'); // Lokasi file disimpan
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade'); // Mata Pelajaran apa
+            $table->foreignId('instructor_id')->constrained()->onDelete('cascade'); // Siapa guru yang upload
+            $table->timestamps();
+    });
     }
 
     public function down()
@@ -70,6 +79,7 @@ return new class extends Migration
         Schema::dropIfExists('students');
         Schema::dropIfExists('instructors');
         Schema::dropIfExists('subjects');
+        Schema::dropIfExists('materials');
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('role');
         });
