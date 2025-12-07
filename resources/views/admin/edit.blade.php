@@ -50,12 +50,7 @@
             </div>
         @endif
 
-        @if(session('error'))
-            <script>alert("{{ session('error') }}");</script>
-        @endif
-        @if(session('success'))
-            <script>alert("{{ session('success') }}");</script>
-        @endif
+        {{-- SweetAlert messages will be shown by the script included at bottom --}}
 
         <div class="table-container">
             <table>
@@ -90,7 +85,7 @@
                                 Edit
                             </button>
 
-                            <form action="{{ route('admin.schedules.destroy', $sched->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin hapus jadwal ini?');">
+                            <form action="{{ route('admin.schedules.destroy', $sched->id) }}" method="POST" style="display:inline;" class="delete-schedule">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-delete">Hapus</button>
@@ -221,7 +216,7 @@
 
             document.getElementById('edit_subject_name').value = subjectName;
             document.getElementById('edit_instructor_id').value = instructorId;
-            document.getElementById('edit_grade_level').value = grade_level;
+            document.getElementById('edit_grade_level').value = grade;
             document.getElementById('edit_day').value = day;
             document.getElementById('edit_time_start').value = start;
             document.getElementById('edit_time_end').value = end;
@@ -234,6 +229,54 @@
                 event.target.style.display = 'none';
             }
         }
+    </script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Show session messages via SweetAlert2
+        (function() {
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Jadwal Bentrok!',
+                    text: {!! json_encode(session('error')) !!},
+                });
+            @endif
+
+            @if(session('success'))
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: {!! json_encode(session('success')) !!},
+                    showConfirmButton: false,
+                    timer: 2000,
+                    toast: true
+                });
+            @endif
+        })();
+
+        // Delete confirmation for schedules
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form.delete-schedule').forEach(function(form){
+                form.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Yakin hapus jadwal ini?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, hapus',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
