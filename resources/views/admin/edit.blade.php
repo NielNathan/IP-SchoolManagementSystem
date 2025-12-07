@@ -231,10 +231,9 @@
         }
     </script>
     
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Show session messages via SweetAlert2
+
         (function() {
             @if(session('error'))
                 Swal.fire({
@@ -256,7 +255,6 @@
             @endif
         })();
 
-        // Delete confirmation for schedules
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('form.delete-schedule').forEach(function(form){
                 form.addEventListener('submit', function(e){
