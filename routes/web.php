@@ -49,6 +49,10 @@ Route::middleware(['auth', EnsureRoleTeacher::class])->group(function () {
     Route::get('/instructor-dashboard', [InstructorController::class, 'index'])->name('instructor.dashboard');
     Route::get('/upload-materi', [MaterialController::class, 'create'])->name('materials.create');
     Route::post('/upload-materi', [MaterialController::class, 'store'])->name('materials.store');
+    Route::get('/materi-saya', [MaterialController::class, 'myMaterials'])->name('instructor.materials.index');
+    Route::get('/materi-saya/{id}/edit', [MaterialController::class, 'editMaterial'])->name('instructor.materials.edit');
+    Route::put('/materi-saya/{id}', [MaterialController::class, 'updateMaterial'])->name('instructor.materials.update');
+    Route::delete('/materi-saya/{id}', [MaterialController::class, 'deleteMaterial'])->name('instructor.materials.delete');
     Route::post('/instructor/kick-student', [InstructorController::class, 'kickStudent'])->name('instructor.kick_student');
 });
 
