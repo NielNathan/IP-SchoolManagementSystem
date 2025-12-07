@@ -10,6 +10,9 @@ use App\Models\Subject;
 
 class StudentController extends Controller
 {
+    // ==========================================================
+    // 1. HALAMAN UTAMA (JADWAL SAYA & PILIH KELAS)
+    // ==========================================================
     public function index()
     {
         $user = Auth::user();
@@ -17,69 +20,146 @@ class StudentController extends Controller
 
         if(!$student) return "Error: Data Profile Siswa tidak ditemukan.";
 
+        // Ambil jenjang kelas (misal "10" dari "10-IPA")
         $studentGradeLevel = explode('-', $student->class_grade)[0];
 
+        // Daftar Nama Mapel Wajib (Harus sama persis dengan di Database)
         $wajibTaken = [
-            'Pendidikan Agama dan Budi Pekerti',
+            'Pendidikan Agama dan Budi Pekerti', 
             'Pendidikan Pancasila dan Kewarganegaraan', 
             'Bahasa Indonesia', 
             'Bahasa Inggris', 
             'Matematika (Wajib)', 
-            'PJOK',
+            'PJOK', 
             'Sejarah'
         ];
 
-        // 1. AMBIL JADWAL SAYA (Bersihkan duplikat tampilan)
+        // ---------------------------------------------------------
+        // FITUR BARU: AUTO-ASSIGN MAPEL WAJIB
+        // ---------------------------------------------------------
+        $this->autoEnrollWajib($student, $studentGradeLevel, $wajibTaken);
+        // ---------------------------------------------------------
+
+        // --- 1. AMBIL JADWAL SAYA (YANG SUDAH DIAMBIL/AUTO-ASSIGNED) ---
+        // Refresh data jadwal setelah auto-enroll
         $rawSchedules = $student->schedules()->with(['subject', 'instructor'])->get();
         
+        // Filter Tampilan (Satu mapel cukup tampil sekali)
         $mySchedules = $rawSchedules->unique(function ($item) {
-            return $item->subject_id . '-' . $item->day . '-' . $item->time_start;
+            return strtolower(preg_replace('/\s+/', '', $item->subject->name)); 
         });
 
-        // 2. BUAT "DAFTAR BLACKLIST" (Signature Mapel yang sudah diambil)
-        // Kita simpan "SubjectID-Hari-Jam" yang sudah diambil siswa
-        $takenSignatures = $mySchedules->map(function ($item) {
-            return $item->subject_id . '-' . $item->day . '-' . $item->time_start;
+        // Simpan daftar mapel yang sudah diambil untuk blacklist pilihan
+        $takenNamesNormalized = $mySchedules->map(function ($item) {
+            return strtolower(preg_replace('/\s+/', '', $item->subject->name));
         })->toArray();
 
-        // 3. AMBIL SEMUA JADWAL SESUAI JENJANG
-        $allSchedules = Schedule::with(['subject', 'instructor'])
+        // --- 2. AMBIL JADWAL TERSEDIA ---
+        $allSchedulesRaw = Schedule::with(['subject', 'instructor'])
             ->where('grade_level', $studentGradeLevel)
             ->get();
 
-        // 4. FILTER JADWAL PILIHAN (LOGIKA BARU)
-        // Buang jadwal jika "Signature"-nya ada di daftar blacklist
-        // Ini akan membuang ID 102 jika ID 101 (mapel sama) sudah diambil.
-        $allSchedules = $allSchedules->reject(function ($item) use ($takenSignatures) {
-            $signature = $item->subject_id . '-' . $item->day . '-' . $item->time_start;
-            return in_array($signature, $takenSignatures);
+        // --- 3. FILTER DAFTAR PILIHAN ---
+        // Buang jadwal yang namanya sudah ada di jadwal saya
+        $allSchedules = $allSchedulesRaw->reject(function ($item) use ($takenNamesNormalized) {
+            $name = strtolower(preg_replace('/\s+/', '', $item->subject->name));
+            return in_array($name, $takenNamesNormalized);
         });
 
-        // 5. BERSIHKAN DUPLIKAT DI DAFTAR PILIHAN
-        // Agar tidak muncul 5 baris "Biologi" yang sama
+        // Bersihkan duplikat di daftar pilihan
         $allSchedules = $allSchedules->unique(function ($s) {
-            return $s->subject_id . '-' . $s->day . '-' . $s->time_start;
+            return strtolower(preg_replace('/\s+/', '', $s->subject->name));
         })->values();
 
         $totalTaken = $mySchedules->count();
 
-        return view('student.home', compact(
+        return view('student.pilih', compact(
             'student', 'allSchedules', 'mySchedules', 'totalTaken', 'wajibTaken'
         ));
     }
 
-    // ... (Function enroll, unenroll, dashboard biarkan tetap sama) ...
+    // ==========================================================
+    // FUNGSI BANTUAN: AUTO ENROLL LOGIC
+    // ==========================================================
+    private function autoEnrollWajib($student, $gradeLevel, $wajibNames)
+    {
+        // 1. Ambil semua jadwal mata pelajaran WAJIB untuk jenjang ini
+        $availableWajibSchedules = Schedule::whereHas('subject', function($q) use ($wajibNames) {
+            $q->whereIn('name', $wajibNames);
+        })
+        ->where('grade_level', $gradeLevel)
+        ->with('subject')
+        ->get();
+
+        // 2. Cek satu per satu mapel wajib
+        foreach ($wajibNames as $wajibName) {
+            // Normalisasi nama wajib
+            $targetName = strtolower(preg_replace('/\s+/', '', $wajibName));
+
+            // Cek apakah siswa SUDAH punya mapel ini?
+            $hasMapel = $student->schedules()->get()->contains(function($s) use ($targetName) {
+                return strtolower(preg_replace('/\s+/', '', $s->subject->name)) === $targetName;
+            });
+
+            // JIKA BELUM PUNYA, CARIKAN JADWALNYA & MASUKKAN
+            if (!$hasMapel) {
+                // Cari jadwal yang namanya cocok
+                $scheduleToTake = $availableWajibSchedules->first(function($s) use ($targetName) {
+                    return strtolower(preg_replace('/\s+/', '', $s->subject->name)) === $targetName;
+                });
+
+                if ($scheduleToTake) {
+                    // Masukkan ke jadwal siswa (Attach)
+                    // Kita pakai try-catch biar kalau ada error duplikat id tidak crash
+                    try {
+                        $student->schedules()->attach($scheduleToTake->id);
+                    } catch (\Exception $e) {
+                        // Ignore error (mungkin race condition atau data kotor)
+                    }
+                }
+            }
+        }
+    }
+
+    // ==========================================================
+    // 2. HALAMAN MATERI
+    // ==========================================================
+    public function materi()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+
+        $rawSchedules = $student->schedules()
+            ->with(['subject.materials', 'instructor'])
+            ->get();
+
+        $enrolledSchedules = $rawSchedules->unique(function($item) {
+            return strtolower(preg_replace('/\s+/', '', $item->subject->name));
+        });
+
+        return view('student.materi', compact('enrolledSchedules'));
+    }
+
+    // ==========================================================
+    // 3. PROSES AMBIL & BATAL KELAS
+    // ==========================================================
     public function enroll(Request $request)
     {
         $student = Auth::user()->student;
-        $schedule = Schedule::find($request->schedule_id);
+        $schedule = Schedule::with('subject')->find($request->schedule_id);
         
-        // Cek apakah siswa SUDAH punya mapel ini (berdasarkan Subject ID)
-        $alreadyHasSubject = $student->schedules()->whereHas('subject', function($q) use ($schedule) {
-            $q->where('id', $schedule->subject_id);
-        })->exists();
+        if(!$schedule) return back()->with('error', 'Jadwal tidak ditemukan');
 
-        if ($alreadyHasSubject) {
+        // Validasi Duplikat Nama Mapel
+        $targetName = strtolower(preg_replace('/\s+/', '', $schedule->subject->name));
+        
+        $alreadyHasName = $student->schedules()->get()->contains(function ($enrolled) use ($targetName) {
+            return strtolower(preg_replace('/\s+/', '', $enrolled->subject->name)) === $targetName;
+        });
+
+        if ($alreadyHasName) {
             return back()->with('error', 'Anda sudah mengambil mata pelajaran ini!');
         }
 
@@ -102,113 +182,50 @@ class StudentController extends Controller
         return back()->with('success', 'Mata pelajaran berhasil dihapus dari jadwal.');
     }
 
-    public function dashboard()
-    {
+    // ==========================================================
+    // 4. PROFIL & LAINNYA
+    // ==========================================================
+    public function dashboard() {
         $user = Auth::user();
         $student = $user->student;
-        if (!$student) return "Error.";
-        return view('student.dashboard', compact('student'));
+        return view('student.dashboard', compact('student')); 
+    
     }
+    public function pilih() { return $this->index(); }
 
-    // MATERI - Tampilkan Materi dari Mata Pelajaran yang Dipilih
-    public function materi()
-    {
-        $user = Auth::user();
-        $student = $user->student;
-
-        if (!$student) {
-            return "Error: Data Profile Siswa tidak ditemukan.";
-        }
-
-        // Ambil jadwal yang sudah diambil siswa beserta subject dan materialnya
-        $enrolledSchedules = $student->schedules()
-                                    ->with(['subject' => function($query) {
-                                        $query->with('materials');
-                                    }, 'instructor'])
-                                    ->get();
-
-        return view('student.materi', compact('student', 'enrolledSchedules'));
-    }
-
-    // EDIT PROFILE - Tampilkan Form Edit Profile
     public function editProfile()
     {
         $user = Auth::user();
         $student = $user->student;
-
-        if (!$student) {
-            return "Error: Data Profile Siswa tidak ditemukan.";
-        }
-
         return view('student.edit-profile', compact('student', 'user'));
     }
 
-    // UPDATE PROFILE - Simpan Perubahan Profile
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
-            return "Error: Data Profile Siswa tidak ditemukan.";
-        }
-
-        // Validasi input
         $validated = $request->validate([
             'fullname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         try {
-            // Update data user
-            $user->update([
-                'email' => $validated['email'],
-            ]);
+            $user->update(['email' => $validated['email']]);
+            $student->update(['fullname' => $validated['fullname']]);
 
-            // Update data student
-            $student->update([
-                'fullname' => $validated['fullname'],
-            ]);
-
-            // Handle upload foto
             if ($request->hasFile('photo')) {
-                // Hapus foto lama jika ada
                 if ($student->photo && Storage::exists('public/' . $student->photo)) {
                     Storage::delete('public/' . $student->photo);
                 }
-
-                // Simpan foto baru
                 $path = $request->file('photo')->store('students', 'public');
                 $student->update(['photo' => $path]);
             }
 
-            return back()->with('success', 'Profil berhasil diperbarui!');
+            return back()->with('success', 'Profil diperbarui!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
+            return back()->with('error', 'Gagal update: ' . $e->getMessage());
         }
-    }
-
-    // PILIH - Tampilkan halaman untuk memilih mata pelajaran
-    public function pilih()
-    {
-        $user = Auth::user();
-        $student = $user->student;
-        if (!$student) return "Error: Data Profile Siswa tidak ditemukan.";
-
-        $studentGradeLevel = explode('-', $student->class_grade)[0];
-        $wajibTaken = ['Pendidikan Agama dan Budi Pekerti', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
-        $mySchedules = $student->schedules()->with(['subject', 'instructor'])->get();
-        $takenSubjectIds = $mySchedules->pluck('subject_id')->toArray();
-
-        $allSchedules = Schedule::with(['subject', 'instructor'])
-                        ->whereNotIn('subject_id', $takenSubjectIds)
-                        ->where('grade_level', $studentGradeLevel)
-                        ->get();
-
-        $totalTaken = $mySchedules->count();
-
-        return view('student.pilih', compact('student', 'allSchedules', 'mySchedules', 'totalTaken', 'wajibTaken'));
     }
 }

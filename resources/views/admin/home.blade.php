@@ -71,22 +71,6 @@
             </div>
         </div>
 
-        <div class="table-container" style="margin-bottom: 30px;">
-            <table>
-                <thead><tr><th>Peringkat</th><th>Mata Pelajaran Pilihan</th><th>Guru Pengajar</th><th>Jumlah Siswa</th></tr></thead>
-                <tbody>
-                    @foreach($topClasses as $index => $class)
-                    <tr>
-                        <td>#{{ $index + 1 }}</td>
-                        <td style="font-weight: bold; color: #2563eb;">{{ $class->subject->name ?? '-' }}</td>
-                        <td>{{ $class->instructor->fullname ?? '-' }}</td>
-                        <td><span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 20px; font-weight: 600; font-size: 12px;">{{ $class->students_count }} Siswa</span></td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
         <h3 class="section-title">📋 Data Lengkap Semua Kelas</h3>
         <div class="table-container">
             <table>
@@ -111,7 +95,7 @@
                             {{ $class->day }}, 
                             {{ substr($class->time_start, 0, 5) }} - {{ substr($class->time_end, 0, 5) }}
                         </td>
-                        <td>{{ $class->students->count() }} Siswa</td>
+                        <td>{{ count($class->multi_students) }} Siswa</td>
                         <td><button class="btn-view" onclick="openModal('modal-{{ $class->id }}')">Lihat Siswa</button></td>
                     </tr>
                     @endforeach
@@ -127,17 +111,16 @@
                 <div class="modal-title">{{ $class->subject->name ?? 'Detail' }}</div>
                 <span class="close-btn" onclick="closeModal('modal-{{ $class->id }}')">&times;</span>
             </div>
-            
-            <p style="margin-top: 0; color: #6b7280; font-size: 13px;">Pengajar: {{ $class->instructor->fullname ?? '-' }}</p>
-            <hr style="border:0; border-top:1px solid #eee; margin: 10px 0;">
 
             <ul class="student-list-modal">
-                @if($class->students->isEmpty())
+                {{-- PERBAIKAN UTAMA DI SINI: Gunakan 'multi_students' --}}
+                @if($class->multi_students->isEmpty())
                     <li style="justify-content: center; color: #9ca3af; font-style: italic;">Belum ada siswa di kelas ini.</li>
                 @else
                     <?php
-                        // Grouping tampilan siswa per jenjang
-                        $groupedStudents = $class->students->sortBy('class_grade')->groupBy(function($s) {
+                        // Grouping tampilan siswa per jenjang dari data MULTI_STUDENTS
+                        $groupedStudents = $class->multi_students->sortBy('class_grade')->groupBy(function($s) {
+                            // Asumsi format kelas: "10-IPA" -> ambil "10"
                             return explode('-', $s->class_grade)[0];
                         });
                     ?>
@@ -145,7 +128,7 @@
                         <div class="grade-divider">SISWA KELAS {{ $level }}</div>
                         @foreach($students as $student)
                             <li>
-                                <span>{{ $student->fullname }} <small style="color:#888">({{ $student->nis }})</small></span>
+                                <span>{{ $student->fullname }} <small style="color:#888">({{ $student->nis ?? 'NIS' }})</small></span>
                                 <span class="badge-kelas">{{ $student->class_grade }}</span>
                             </li>
                         @endforeach

@@ -41,7 +41,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="btn btn-back">Kembali ke Dashboard</a>
             </div>
             <h1>Manajemen Jadwal</h1>
-            <button onclick="openCreateModal()" class="btn btn-create">➕ Buat Jadwal Baru</button>
+            <button onclick="openCreateModal()" class="btn btn-create">Buat Jadwal Baru</button>
         </div>
 
         @if(session('success'))

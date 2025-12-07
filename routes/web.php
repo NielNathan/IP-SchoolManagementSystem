@@ -20,17 +20,29 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth', \App\Http\Middleware\EnsureRoleStudent::class])->group(function () {
-    Route::get('/student-pilihmapel', [StudentController::class, 'index'])->name('student.index');
-    Route::get('/student-pilih', [StudentController::class, 'pilih'])->name('student.pilih');
+Route::middleware(['auth', EnsureRoleStudent::class])->group(function () {
+    // 1. DASHBOARD UTAMA (JADWAL & PILIH MAPEL)
+    // Arahkan ke method 'index' yang punya logika filter jadwal & auto-enroll
+    Route::get('/student-dashboard', [StudentController::class, 'index'])->name('student.index');
+
+    // 2. HALAMAN PROFIL
+    // Arahkan ke method 'dashboard' (yang isinya profil siswa)
     Route::get('/student-profile', [StudentController::class, 'dashboard'])->name('student.dashboard');
-    Route::get('/student-materi', [StudentController::class, 'materi'])->name('student.materi');
+
+    // 3. EDIT PROFIL
     Route::get('/student-edit-profile', [StudentController::class, 'editProfile'])->name('student.edit-profile');
     Route::put('/student-update-profile', [StudentController::class, 'updateProfile'])->name('student.update-profile');
+
+    // 4. ACTION AMBIL/HAPUS KELAS
     Route::post('/enroll-course', [StudentController::class, 'enroll'])->name('student.enroll');
     Route::post('/unenroll-course', [StudentController::class, 'unenroll'])->name('student.unenroll');
-    Route::get('/materi', [MaterialController::class, 'index'])->name('materials.index');
+
+    // 5. LIHAT MATERI (SISWA)
+    Route::get('/student-materi', [StudentController::class, 'materi'])->name('student.materi');
     Route::get('/materi/baca/{id}', [MaterialController::class, 'show'])->name('materials.show');
+    
+    // Route cadangan jika ada link lama mengarah ke sini
+    Route::get('/student-pilih', [StudentController::class, 'index'])->name('student.pilih');
 });
 
 Route::middleware(['auth', EnsureRoleTeacher::class])->group(function () {

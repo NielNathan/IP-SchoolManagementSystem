@@ -9,23 +9,25 @@ use App\Models\Instructor;
 use App\Models\Subject;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB; // Tambahkan ini biar aman
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        // 1. BERSIHKAN DATABASE
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         User::truncate();
         Student::truncate();
         Instructor::truncate();
         Subject::truncate();
         Schedule::truncate();
-        DB::table('enrollments')->truncate();
+        // Pastikan nama tabel pivot benar (cek di migration kamu, biasanya schedule_student)
+        DB::table('enrollments')->truncate(); 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // ==========================================
-        // 1. BUAT USER GURU
+        // 2. BUAT USER GURU
         // ==========================================
         $teachers = [
             ['name' => 'Pak Budi', 'email' => 'budi@guru.com', 'nip' => '198001', 'full' => 'Budi Santoso, S.Pd'],
@@ -50,10 +52,10 @@ class DatabaseSeeder extends Seeder
         }
 
         // ==========================================
-        // 2. BUAT USER SISWA
+        // 3. BUAT USER SISWA
         // ==========================================
         
-        // Siswa 1: Danelle
+        // Siswa 1: Danelle (Kelas 11)
         $userDanelle = User::create([
             'name' => 'Danelle',
             'email' => 'danelle@school.com',
@@ -67,7 +69,7 @@ class DatabaseSeeder extends Seeder
             'class_grade' => 'XI-1'
         ]);
 
-        // Siswa 2: James
+        // Siswa 2: James (Kelas 10)
         $userJames = User::create([
             'name' => 'James',
             'email' => 'james@school.com',
@@ -84,7 +86,7 @@ class DatabaseSeeder extends Seeder
         $allStudents = [$siswaDanelle, $siswaJames];
 
         // ==========================================
-        // 3. DAFTAR MATA PELAJARAN
+        // 4. BUAT JADWAL & AUTO ASSIGN
         // ==========================================
         $jenjangs = ['X', 'XI', 'XII'];
         
@@ -92,6 +94,8 @@ class DatabaseSeeder extends Seeder
         $mapelPilihan = ['Biologi', 'Fisika', 'Ekonomi', 'Sosiologi'];
 
         foreach ($jenjangs as $jenjang) {
+            
+            // --- A. LOOP MAPEL WAJIB (AUTO ASSIGN) ---
             foreach ($mapelWajib as $m) {
                 $sub = Subject::firstOrCreate(['name' => $m]);
 
@@ -105,13 +109,21 @@ class DatabaseSeeder extends Seeder
                     'quota' => 40
                 ]);
 
+                // *** LOGIKA PERBAIKAN DI SINI ***
                 foreach ($allStudents as $stu) {
-                    if (str_contains($stu->class_grade, $jenjang)) {
+                    // 1. Pecah "XI-1" menjadi ["XI", "1"]
+                    $parts = explode('-', $stu->class_grade);
+                    $gradeOnly = $parts[0]; // Ambil "XI" saja
+
+                    // 2. Bandingkan PERSIS (===)
+                    // Jadi "XI" tidak akan dianggap sama dengan "X"
+                    if ($gradeOnly === $jenjang) {
                         $stu->schedules()->syncWithoutDetaching([$sched->id]);
                     }
                 }
             }
 
+            // --- B. LOOP MAPEL PILIHAN (JANGAN AUTO ASSIGN) ---
             foreach ($mapelPilihan as $m) {
                 $sub = Subject::firstOrCreate(['name' => $m]);
                 

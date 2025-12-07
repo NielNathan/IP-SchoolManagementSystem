@@ -160,7 +160,6 @@
             <div class="subject-section">
                 <div class="subject-header">
                     <h2>{{ $schedule->subject->name }}</h2>
-                    <p>👨‍🏫 Pengajar: {{ $schedule->instructor->name ?? 'Tidak ada' }}</p>
                 </div>
 
                 @if($schedule->subject->materials && count($schedule->subject->materials) > 0)
