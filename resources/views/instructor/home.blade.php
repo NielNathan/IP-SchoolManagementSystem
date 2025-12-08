@@ -106,7 +106,7 @@
         @else
             @foreach($myClasses as $class)
                 <div class="class-card">
-                    <h3>Mata Pelajaran: {{ $class->subject->name }}</h3>
+                    <h3>{{ $class->subject->name }}</h3>
                     
                     <div class="class-info">
                         Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time_start }} - {{ $class->time_end }} &nbsp;|&nbsp; Kelas: {{ $class->grade_level }}

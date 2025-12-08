@@ -183,8 +183,8 @@
             
             <div class="info-card">
                 <span class="info-card-label">✉️ Email</span>
-                <div class="info-card-value" style="font-size: 14px; word-break: break-all;">
-                    {{ $student->email ?? '-' }}
+                <div class="info-card-value" style="font-size: 16px; word-break: break-all;">
+                    {{ $student->user->email ?? '-' }}
                 </div>
             </div>
         </div>

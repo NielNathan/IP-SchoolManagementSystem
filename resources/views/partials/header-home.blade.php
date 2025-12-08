@@ -19,7 +19,7 @@
                     <a href="{{ route('student.dashboard') }}" class="nav-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">📋 Profil</a>
                     <a href="{{ route('student.pilih') }}" class="nav-item {{ request()->routeIs('student.pilih') ? 'active' : '' }}">📚 Pilih Mapel</a>
                     <a href="{{ route('student.materi') }}" class="nav-item {{ request()->routeIs('student.materi') ? 'active' : '' }}">📖 Materi</a>
-                    <a href="{{ route('student.edit-profile') }}" class="nav-item" {{ request()->routeIs('student.edit-profile') ? 'active' : '' }}">✏️ Edit profile</a>
+                    <a href="{{ route('student.edit-profile') }}" class="nav-item {{ request()->routeIs('student.edit-profile') ? 'active' : '' }}">✏️ Edit Profile</a>
                 </nav>
             @endif
         @endauth

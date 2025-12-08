@@ -11,7 +11,8 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\AdminScheduleController;
 
-Route::get('/', function () { return view('home'); });
+Route::get('/', function () { return view('welcome'); })->name('welcome');
+
 
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.process');
