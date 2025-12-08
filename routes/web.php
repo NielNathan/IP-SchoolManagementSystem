@@ -22,12 +22,10 @@ Route::post('/login', [AuthController::class, 'authenticate'])->name('login.proc
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', EnsureRoleStudent::class])->group(function () {
-    // 1. DASHBOARD UTAMA (JADWAL & PILIH MAPEL)
-    // Arahkan ke method 'index' yang punya logika filter jadwal & auto-enroll
+    // 1. DASHBOARD UTAMA
     Route::get('/student-dashboard', [StudentController::class, 'index'])->name('student.index');
 
     // 2. HALAMAN PROFIL
-    // Arahkan ke method 'dashboard' (yang isinya profil siswa)
     Route::get('/student-profile', [StudentController::class, 'dashboard'])->name('student.dashboard');
 
     // 3. EDIT PROFIL
@@ -38,12 +36,16 @@ Route::middleware(['auth', EnsureRoleStudent::class])->group(function () {
     Route::post('/enroll-course', [StudentController::class, 'enroll'])->name('student.enroll');
     Route::post('/unenroll-course', [StudentController::class, 'unenroll'])->name('student.unenroll');
 
-    // 5. LIHAT MATERI (SISWA)
+    // 5. LIHAT MATERI
     Route::get('/student-materi', [StudentController::class, 'materi'])->name('student.materi');
     Route::get('/materi/baca/{id}', [MaterialController::class, 'show'])->name('materials.show');
     
-    // Route cadangan jika ada link lama mengarah ke sini
+    // Route cadangan
     Route::get('/student-pilih', [StudentController::class, 'index'])->name('student.pilih');
+
+    // --- PERBAIKAN DI SINI ---
+    // Ubah namanya menjadi 'student.schedule.finalize' agar sesuai dengan View
+    Route::post('/schedule/finalize', [StudentController::class, 'finalizeSchedule'])->name('student.schedule.finalize');
 });
 
 Route::middleware(['auth', EnsureRoleTeacher::class])->group(function () {
@@ -63,4 +65,8 @@ Route::middleware(['auth', EnsureRoleAdmin::class])->group(function () {
     Route::post('/admin/edit', [AdminScheduleController::class, 'store'])->name('admin.schedules.store');
     Route::put('/admin/edit/{id}', [AdminScheduleController::class, 'update'])->name('admin.schedules.update');
     Route::delete('/admin/edit/{id}', [AdminScheduleController::class, 'destroy'])->name('admin.schedules.destroy');
+
+    // --- PERBAIKAN DI SINI ---
+    // Ubah namanya menjadi 'admin.student.reset' agar sesuai dengan View Admin
+    Route::post('/student/{id}/reset-schedule', [AdminController::class, 'resetStudentSchedule'])->name('admin.student.reset');
 });

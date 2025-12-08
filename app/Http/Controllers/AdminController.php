@@ -11,12 +11,10 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // --- BAGIAN STATISTIK ---
         $totalSiswa = Student::count();
         $totalGuru = Instructor::count();
         $totalKelas = Schedule::count();
 
-        // --- BAGIAN TOP 5 KELAS ---
         $wajibSubjects = [
             'Pendidikan Agama dan Budi Pekerti',
             'Pendidikan Pancasila dan Kewarganegaraan',
@@ -36,28 +34,20 @@ class AdminController extends Controller
                     ->take(5)
                     ->get();
 
-        // --- BAGIAN UTAMA (PERBAIKAN ERROR & DUPLIKAT) ---
-        
-        // 1. Ambil data mentah sebagai OBJECT (Model)
         $rawSchedules = Schedule::with(['subject', 'instructor', 'students'])->get();
 
-        // 2. Lakukan Grouping di sini agar baris tidak dobel-dobel
-        // Kunci Grouping: ID Mapel - ID Guru - Hari - Jam (07:00)
         $groupedSchedules = $rawSchedules->groupBy('subject_id');
 
         $allClasses = $groupedSchedules->map(function($group) {
 
             $representative = $group->first();
 
-            // Gabung guru
             $mergedInstructors = $group->map(function($item){
                 return $item->instructor;
             })->unique('id')->values();
 
-            // Gabung siswa
             $mergedStudents = $group->flatMap->students->unique('id')->values();
 
-            // Ambil waktu dan hari pertama (boleh di-custom nanti)
             $representative->multi_instructors = $mergedInstructors;
             $representative->multi_students = $mergedStudents;
 
@@ -65,7 +55,32 @@ class AdminController extends Controller
 
         })->values();
 
-        // Kirim ke View (Data $allClasses sekarang berisi OBJECT bersih)
         return view('admin.home', compact('totalSiswa', 'totalGuru', 'totalKelas', 'topClasses', 'allClasses'));
+    }
+
+    public function resetStudentSchedule($id)
+    {
+        $student = Student::find($id);
+        
+        $student->is_schedule_finalized = false;
+        
+        $student->save();
+
+        return redirect()->back()->with('success', 'Status jadwal siswa berhasil di-reset. Siswa dapat mengambil mapel lagi.');
+    }
+
+    public function resetAllSchedules()
+    {
+        $students = Student::all();
+        
+        foreach($students as $student) {
+            $student->is_schedule_finalized = false;
+
+            $student->schedules()->detach(); 
+            
+            $student->save();
+        }
+        
+        return redirect()->back()->with('success', 'Semua jadwal siswa telah dikosongkan untuk semester baru.');
     }
 }

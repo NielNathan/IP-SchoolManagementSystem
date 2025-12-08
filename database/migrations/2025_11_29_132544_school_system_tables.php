@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string('nis')->unique();
             $table->string('fullname');
             $table->string('class_grade'); // X, XI, XII
+            $table->boolean('is_schedule_finalized')->default(false);
             $table->timestamps();
         });
 

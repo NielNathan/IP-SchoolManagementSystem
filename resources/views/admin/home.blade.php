@@ -28,16 +28,31 @@
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: slideDown 0.3s ease-out; }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 550px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: slideDown 0.3s ease-out; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .modal-title { font-weight: 700; font-size: 18px; color: #1f2937; }
         .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-btn:hover { color: #000; }
-        .student-list-modal { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; }
-        .student-list-modal li { padding: 10px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; }
-        .grade-divider { background: #f3f4f6; color: #374151; font-weight: 700; font-size: 12px; padding: 8px 12px; margin-top: 15px; margin-bottom: 5px; border-radius: 6px; border-left: 4px solid #2563eb; letter-spacing: 0.5px; }
-        .badge-kelas { background: #e5e7eb; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         
+        .student-list-modal { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; }
+        /* Update Flex di LI agar tombol reset rapi */
+        .student-list-modal li { padding: 10px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+        
+        .grade-divider { background: #f3f4f6; color: #374151; font-weight: 700; font-size: 12px; padding: 8px 12px; margin-top: 15px; margin-bottom: 5px; border-radius: 6px; border-left: 4px solid #2563eb; letter-spacing: 0.5px; }
+        .badge-kelas { background: #e5e7eb; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 5px; }
+        
+        /* STYLE BARU UNTUK FITUR RESET */
+        .badge-status-final { background: #dcfce7; color: #166534; font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0; margin-left: 5px; }
+        .badge-status-pending { background: #fef3c7; color: #92400e; font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a; margin-left: 5px; }
+        
+        .btn-reset { 
+            background-color: #fee2e2; color: #991b1b; 
+            border: 1px solid #fecaca; padding: 4px 8px; 
+            border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; 
+            transition: all 0.2s;
+        }
+        .btn-reset:hover { background-color: #ef4444; color: white; border-color: #ef4444; }
+
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
@@ -45,10 +60,23 @@
     @include('partials.header-home')
 
     <div class="container">
+        
+        {{-- Flash Message Admin --}}
+        @if(session('success'))
+            <div style="background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bbf7d0;">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <div class="header">
             <h1>🛡️ Administrator Panel</h1>
             <div style="display: flex; gap: 10px;">
                 <a href="{{ route('admin.schedules.index') }}" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #2563eb; justify-content: center; align-items: center; display: flex;">Edit Jadwal</a>
+                
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" style="background-color: #ef4444; color: white; padding: 12px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #ef4444; justify-content: center; align-items: center; display: flex; cursor:pointer;">Logout</button>
+                </form>
             </div>
         </div>
 
@@ -104,14 +132,11 @@
             </div>
 
             <ul class="student-list-modal">
-                {{-- PERBAIKAN UTAMA DI SINI: Gunakan 'multi_students' --}}
                 @if($class->multi_students->isEmpty())
                     <li style="justify-content: center; color: #9ca3af; font-style: italic;">Belum ada siswa di kelas ini.</li>
                 @else
                     <?php
-                        // Grouping tampilan siswa per jenjang dari data MULTI_STUDENTS
                         $groupedStudents = $class->multi_students->sortBy('class_grade')->groupBy(function($s) {
-                            // Asumsi format kelas: "10-IPA" -> ambil "10"
                             return explode('-', $s->class_grade)[0];
                         });
                     ?>
@@ -119,8 +144,34 @@
                         <div class="grade-divider">SISWA KELAS {{ $level }}</div>
                         @foreach($students as $student)
                             <li>
-                                <span>{{ $student->fullname }} <small style="color:#888">({{ $student->nis ?? 'NIS' }})</small></span>
-                                <span class="badge-kelas">{{ $student->class_grade }}</span>
+                                {{-- Kolom Nama & Info --}}
+                                <div style="display: flex; flex-direction: column;">
+                                    <span>
+                                        {{ $student->fullname }} 
+                                        <small style="color:#888">({{ $student->nis ?? 'NIS' }})</small>
+                                    </span>
+                                    
+                                    {{-- Indikator Status & Kelas --}}
+                                    <div style="margin-top: 2px;">
+                                        <span class="badge-kelas">{{ $student->class_grade }}</span>
+                                        @if($student->is_schedule_finalized)
+                                            <span class="badge-status-final">🔒 Final</span>
+                                        @else
+                                            <span class="badge-status-pending">✎ Draft</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                {{-- Tombol Reset (Hanya muncul jika sudah final) --}}
+                                {{-- Jika admin ingin reset kapan saja, hilangkan if-nya --}}
+                                @if($student->is_schedule_finalized)
+                                    <form action="{{ route('admin.student.reset', $student->id) }}" method="POST" onsubmit="return confirm('Reset status jadwal siswa {{ $student->fullname }}? Siswa akan bisa mengambil/menghapus mapel lagi.');">
+                                        @csrf
+                                        <button type="submit" class="btn-reset" title="Buka Kunci Jadwal">
+                                            🔓 Reset
+                                        </button>
+                                    </form>
+                                @endif
                             </li>
                         @endforeach
                     @endforeach

@@ -245,4 +245,15 @@ class StudentController extends Controller
             return back()->with('error', 'Gagal update: ' . $e->getMessage());
         }
     }
+
+    public function finalizeSchedule()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        $student->is_schedule_finalized = true;
+        $student->save();
+
+        return redirect()->back()->with('success_finalized', true);
+    }
 }
