@@ -15,136 +15,211 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // 1. BERSIHKAN DATABASE
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         User::truncate();
         Student::truncate();
         Instructor::truncate();
         Subject::truncate();
         Schedule::truncate();
-        // Pastikan nama tabel pivot benar (cek di migration kamu, biasanya schedule_student)
         DB::table('enrollments')->truncate(); 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // ==========================================
-        // 2. BUAT USER GURU
-        // ==========================================
-        $teachers = [
-            ['name' => 'Pak Budi', 'email' => 'budi@guru.com', 'nip' => '198001', 'full' => 'Budi Santoso, S.Pd'],
-            ['name' => 'Bu Siti', 'email' => 'siti@guru.com', 'nip' => '198502', 'full' => 'Siti Aminah, M.Pd'],
-            ['name' => 'Pak Joko', 'email' => 'joko@guru.com', 'nip' => '199003', 'full' => 'Joko Anwar, S.Kom'],
+        //  DATA GURU
+
+        $teacherData = [
+            ['Pak Budi', '198001', 'Budi Santoso, S.Pd', ['Matematika (Wajib)', 'Matematika (Peminatan)']],
+            ['Bu Siti', '198502', 'Siti Aminah, M.Pd', ['Bahasa Indonesia', 'Sastra Indonesia']],
+            ['Pak Joko', '199003', 'Joko Anwar, S.Kom', ['Informatika', 'Prakarya']],
+            ['Pak John', '199204', 'Jonny Junu, B.Ed', ['Bahasa Inggris', 'Sastra Inggris']],
+            ['Bu Mega', '198805', 'Mega Pertiwi, S.Si', ['Biologi', 'Kimia']],
+            ['Pak Albertus', '197506', 'Albertus, M.Sc', ['Fisika']],
+            ['Pak Agung', '198207', 'Agung Wicaksana, S.Hum', ['Sejarah Indonesia', 'Sejarah Peminatan']],
+            ['Bu Sri', '198908', 'Sri Mulyani, S.E', ['Ekonomi', 'Akuntansi']],
+            ['Pak Yul', '197009', 'Yulianto Surya, S.Ag', ['Pendidikan Agama dan Budi Pekerti']],
+            ['Pak Raga', '199510', 'Raga Angga, S.Or', ['PJOK']],
+            ['Bu Wahyu', '198711', 'Wahyu Putri, S.Sos', ['Sosiologi', 'Geografi']],
+            ['Bu Citra', '199112', 'Citra Kirana, S.Sn', ['Seni Budaya']],
+            ['Pak Sandy', '198313', 'Sandy Argita, S.H', ['Pendidikan Pancasila dan Kewarganegaraan']],
         ];
 
-        $teacherIds = [];
-        foreach ($teachers as $t) {
+        $instructorsBySubject = [];
+
+        foreach ($teacherData as $idx => $t) {
             $user = User::create([
-                'name' => $t['name'],
-                'email' => $t['email'],
+                'name' => $t[0],
+                'email' => strtolower(str_replace(['.', ' '], '', $t[0])) . '@school.com',
                 'password' => Hash::make('teacher123'),
                 'role' => 'teacher'
             ]);
-            $inst = Instructor::create([
+
+            $instructor = Instructor::create([
                 'user_id' => $user->id,
-                'nip' => $t['nip'],
-                'fullname' => $t['full']
+                'nip' => $t[1],
+                'fullname' => $t[2]
             ]);
-            $teacherIds[] = $inst->id;
+
+            // Mapping Guru ke Mapel
+            foreach ($t[3] as $mapelName) {
+                $instructorsBySubject[$mapelName][] = $instructor->id;
+            }
         }
 
-        // ==========================================
-        // 3. BUAT USER SISWA
-        // ==========================================
-        
-        // Siswa 1: Danelle (Kelas 11)
-        $userDanelle = User::create([
-            'name' => 'Danelle',
-            'email' => 'danelle@school.com',
-            'password' => Hash::make('danel123'),
-            'role' => 'student'
-        ]);
-        $siswaDanelle = Student::create([
-            'user_id' => $userDanelle->id,
-            'nis' => '20250001',
-            'fullname' => 'Roland Danelle Guritno',
-            'class_grade' => 'XI-1'
-        ]);
+        // DATA SISWA
 
-        // Siswa 2: James (Kelas 10)
-        $userJames = User::create([
-            'name' => 'James',
-            'email' => 'james@school.com',
-            'password' => Hash::make('james123'),
-            'role' => 'student'
-        ]);
-        $siswaJames = Student::create([
-            'user_id' => $userJames->id,
-            'nis' => '20250002',
-            'fullname' => 'James Albert Forisa',
-            'class_grade' => 'X-2'
-        ]);
+        $studentsData = [
+            ['James', 'james@school.com', '2025001', 'James Albert Forisa', 'X-1'],
+            ['Danelle', 'danelle@school.com', '2024002', 'Roland Danelle Guritno', 'XI-2'],
+            ['Nathan', 'nathaniel@school.com', '2023003', 'Nathaniel Davis Saputra', 'XII-3'], 
+        ];
 
-        $allStudents = [$siswaDanelle, $siswaJames];
+        $allStudentObjects = [];
 
-        // ==========================================
-        // 4. BUAT JADWAL & AUTO ASSIGN
-        // ==========================================
+        foreach ($studentsData as $s) {
+            $u = User::create([
+                'name' => $s[0],
+                'email' => $s[1],
+                'password' => Hash::make('student123'),
+                'role' => 'student'
+            ]);
+            
+            $stu = Student::create([
+                'user_id' => $u->id,
+                'nis' => $s[2],
+                'fullname' => $s[3],
+                'class_grade' => $s[4]
+            ]);
+
+            $allStudentObjects[] = $stu;
+        }
+
+        // DATA JADWAL
+
+
+        $subjectsWajib = [
+            'Pendidikan Agama dan Budi Pekerti',
+            'Pendidikan Pancasila dan Kewarganegaraan',
+            'Bahasa Indonesia',
+            'Matematika (Wajib)',
+            'Sejarah Indonesia',
+            'Bahasa Inggris',
+            'Seni Budaya',
+            'PJOK',
+            'PKWU'
+        ];
+
+        $subjectsPilihan = [
+            'Matematika (Peminatan)', 'Biologi', 'Fisika', 'Kimia',
+            'Geografi', 'Sejarah Peminatan', 'Sosiologi', 'Ekonomi',
+            'Sastra Inggris', 'Informatika'
+        ];
+
+        // Definisi Jenjang
         $jenjangs = ['X', 'XI', 'XII'];
         
-        $mapelWajib = ['Pendidikan Agama dan Budi Pekerti', 'Bahasa Indonesia', 'Bahasa Inggris', 'Matematika (Wajib)', 'PJOK'];
-        $mapelPilihan = ['Biologi', 'Fisika', 'Ekonomi', 'Sosiologi'];
+        // Definisi Hari & Slot Waktu
+        $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+        $timeSlots = [
+            ['07:00:00', '09:00:00'], 
+            ['09:15:00', '11:15:00'], 
+            ['12:00:00', '14:00:00'], 
+            ['14:15:00', '16:15:00'], 
+        ];
+
+        $busyTeachers = [];
 
         foreach ($jenjangs as $jenjang) {
             
-            // --- A. LOOP MAPEL WAJIB (AUTO ASSIGN) ---
-            foreach ($mapelWajib as $m) {
-                $sub = Subject::firstOrCreate(['name' => $m]);
+            // Gabung semua mapel
+            $allMapel = array_merge($subjectsWajib, $subjectsPilihan);
+            
+            // --- PERBAIKAN UTAMA DI SINI ---
+            // Kita acak urutan mapel supaya Kelas X, XI, XII tidak sama persis urutannya
+            shuffle($allMapel); 
+            
+            // Reset counter waktu untuk setiap jenjang (karena X, XI, XII masuk bareng jam 7)
+            $dayIndex = 0;
+            $slotIndex = 0;
 
-                $sched = Schedule::create([
-                    'subject_id' => $sub->id,
-                    'instructor_id' => $teacherIds[array_rand($teacherIds)],
-                    'grade_level' => $jenjang, 
-                    'day' => 'Senin',
-                    'time_start' => '07:00:00',
-                    'time_end' => '09:00:00',
-                    'quota' => 40
-                ]);
+            foreach ($allMapel as $mapelName) {
+                
+                // 1. Create Subject (FirstOrCreate)
+                $subjectDB = Subject::firstOrCreate(['name' => $mapelName]);
 
-                // *** LOGIKA PERBAIKAN DI SINI ***
-                foreach ($allStudents as $stu) {
-                    // 1. Pecah "XI-1" menjadi ["XI", "1"]
-                    $parts = explode('-', $stu->class_grade);
-                    $gradeOnly = $parts[0]; // Ambil "XI" saja
+                // 2. Cari Guru
+                $availableInstructors = $instructorsBySubject[$mapelName] ?? [];
+                
+                if (empty($availableInstructors)) {
+                    $instructorId = Instructor::first()->id; // Fallback
+                } else {
+                    // Logika Anti Bentrok Sederhana
+                    $instructorId = null;
+                    
+                    // Cek kandidat guru yang kosong di jam ini
+                    foreach ($availableInstructors as $candidateId) {
+                        $currentDay = $days[$dayIndex];
+                        $currentTime = $timeSlots[$slotIndex][0];
 
-                    // 2. Bandingkan PERSIS (===)
-                    // Jadi "XI" tidak akan dianggap sama dengan "X"
-                    if ($gradeOnly === $jenjang) {
-                        $stu->schedules()->syncWithoutDetaching([$sched->id]);
+                        // Jika guru ini BELUM sibuk di hari & jam ini, pilih dia
+                        if (!isset($busyTeachers[$candidateId][$currentDay][$currentTime])) {
+                            $instructorId = $candidateId;
+                            break;
+                        }
+                    }
+
+                    // Jika semua guru sibuk (misal Pak Budi ngajar kelas X dan XI di jam sama),
+                    // Kita harus memaksa ambil salah satu (atau skip). 
+                    // Di sini kita ambil acak saja biar tidak error.
+                    if (!$instructorId) {
+                        $instructorId = $availableInstructors[array_rand($availableInstructors)];
                     }
                 }
-            }
 
-            // --- B. LOOP MAPEL PILIHAN (JANGAN AUTO ASSIGN) ---
-            foreach ($mapelPilihan as $m) {
-                $sub = Subject::firstOrCreate(['name' => $m]);
-                
-                Schedule::create([
-                    'subject_id' => $sub->id,
-                    'instructor_id' => $teacherIds[array_rand($teacherIds)],
-                    'grade_level' => $jenjang, 
-                    'day' => 'Selasa',
-                    'time_start' => '10:00:00',
-                    'time_end' => '12:00:00',
+                // 3. Simpan Jadwal
+                $sched = Schedule::create([
+                    'subject_id' => $subjectDB->id,
+                    'instructor_id' => $instructorId,
+                    'grade_level' => $jenjang,
+                    'day' => $days[$dayIndex],
+                    'time_start' => $timeSlots[$slotIndex][0],
+                    'time_end' => $timeSlots[$slotIndex][1],
                     'quota' => 30
                 ]);
+
+                // Tandai guru sibuk di slot ini
+                $busyTeachers[$instructorId][$days[$dayIndex]][$timeSlots[$slotIndex][0]] = true;
+
+                // 4. Auto Assign Siswa (Khusus Mapel Wajib)
+                if (in_array($mapelName, $subjectsWajib)) {
+                    foreach ($allStudentObjects as $stu) {
+                        $gradeOnly = explode('-', $stu->class_grade)[0];
+                        if ($gradeOnly === $jenjang) {
+                            $stu->schedules()->syncWithoutDetaching([$sched->id]);
+                        }
+                    }
+                }
+
+                // 5. Geser Waktu
+                $slotIndex++;
+                
+                // Jika slot hari ini habis (misal sudah 4 mapel), pindah hari besok
+                if ($slotIndex >= count($timeSlots)) {
+                    $slotIndex = 0;     
+                    $dayIndex++;        
+                }
+
+                // Jika hari sudah lewat Jumat, stop (mapel sisa tidak dibuatkan jadwal)
+                if ($dayIndex >= count($days)) {
+                    break; 
+                }
             }
         }
 
-        // BUAT USER ADMIN
+        // BUAT ADMIN
         User::create([
             'name' => 'Administrator',
             'email' => 'admin@school.com',
             'password' => Hash::make('admin123'),
-            'role' => 'admin' 
+            'role' => 'admin'
         ]);
     }
 }

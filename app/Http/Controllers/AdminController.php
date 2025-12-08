@@ -19,10 +19,12 @@ class AdminController extends Controller
             'Pendidikan Agama dan Budi Pekerti',
             'Pendidikan Pancasila dan Kewarganegaraan',
             'Bahasa Indonesia',
-            'Bahasa Inggris',
             'Matematika (Wajib)',
+            'Sejarah Indonesia',
+            'Bahasa Inggris',
+            'Seni Budaya',
             'PJOK',
-            'Sejarah',
+            'PKWU'
         ];
 
         $topClasses = Schedule::with('subject')
@@ -53,7 +55,11 @@ class AdminController extends Controller
 
             return $representative;
 
-        })->values();
+        })
+        ->sortBy(function($kelas) {
+            return $kelas->subject->name; 
+        })
+        ->values();
 
         return view('admin.home', compact('totalSiswa', 'totalGuru', 'totalKelas', 'topClasses', 'allClasses'));
     }

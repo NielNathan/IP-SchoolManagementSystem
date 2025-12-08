@@ -72,11 +72,6 @@
             <h1>🛡️ Administrator Panel</h1>
             <div style="display: flex; gap: 10px;">
                 <a href="{{ route('admin.schedules.index') }}" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #2563eb; justify-content: center; align-items: center; display: flex;">Edit Jadwal</a>
-                
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" style="background-color: #ef4444; color: white; padding: 12px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #ef4444; justify-content: center; align-items: center; display: flex; cursor:pointer;">Logout</button>
-                </form>
             </div>
         </div>
 

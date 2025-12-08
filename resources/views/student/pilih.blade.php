@@ -43,8 +43,11 @@
 
     <div class="info-box">
         <strong>Total Mata Pelajaran: {{ $totalTaken }} / 12</strong>
-        @if($totalTaken >= 12)
-            <br><span style="color: #dc2626; font-weight: bold;">Jadwal Penuh! Hapus mapel pilihan jika ingin mengganti.</span>
+        @if(session('warning_full'))
+            <br>
+            <span style="color: #dc2626; font-weight: bold; animation: fadeIn 0.5s;">
+                Jadwal Penuh! Hapus mapel pilihan jika ingin mengganti.
+            </span>
         @endif
     </div>
 
@@ -106,11 +109,6 @@
 
     @if(!$isFinal)
     <div class="submit-section submit-warning">
-        <h4 style="margin: 0 0 10px 0; color: #c2410c;">Sudah yakin dengan pilihan jadwal?</h4>
-        <p style="margin: 0 0 15px 0; font-size: 14px; color: #9a3412;">
-            Pastikan Anda telah mengambil semua kelas yang diinginkan. <br>
-            Setelah klik tombol di bawah, <strong>jadwal tidak dapat diubah lagi</strong>.
-        </p>
         <form action="{{ route('student.schedule.finalize') }}" method="POST" onsubmit="return confirm('APAKAH ANDA YAKIN? Jadwal akan dikunci permanen.');">
             @csrf
             <button type="submit" class="btn-final">

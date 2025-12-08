@@ -97,8 +97,8 @@
 
             <div class="form-group">
                 <label for="file">File Materi</label>
-                <input type="file" name="file" id="file" accept=".pdf, .jpg, .png" required>
-                <p class="helper-text">*Format yang disarankan: PDF, JPG, atau PNG.</p>
+                <input type="file" name="file" id="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip" required>
+                <p class="helper-text">*Format yang didukung: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, JPG, PNG, MP4, ZIP (Max: 50MB)</p>
             </div>
 
             <div class="btn-group">

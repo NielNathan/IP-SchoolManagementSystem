@@ -30,7 +30,7 @@ th { background-color: #f9fafb; font-weight: 600; color: #374151; }
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="color: #111827; margin: 0;">Daftar Materi yang Saya Upload</h2>
         <a href="{{ route('materials.create') }}" class="btn btn-primary">
-            ➕ Upload Materi Baru
+            Upload Materi Baru
         </a>
     </div>
 
@@ -83,7 +83,7 @@ th { background-color: #f9fafb; font-weight: 600; color: #374151; }
 
     <div style="text-align: center; margin-top: 30px;">
         <a href="{{ route('instructor.dashboard') }}" class="btn btn-secondary" style="display: inline-block; padding: 10px 24px;">
-            ← Kembali ke Dashboard
+            Kembali ke Dashboard
         </a>
     </div>
 </div>

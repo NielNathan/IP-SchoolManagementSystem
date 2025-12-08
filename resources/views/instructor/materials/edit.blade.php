@@ -62,7 +62,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb
         </div>
 
         <div class="form-group">
-            <label for="grade_level">Tingkat Kelas</label>
+            <label for="grade_level">Kelas</label>
             <select id="grade_level" name="grade_level" required>
                 <option value="">Pilih Tingkat Kelas</option>
                 @if($grades->isNotEmpty())

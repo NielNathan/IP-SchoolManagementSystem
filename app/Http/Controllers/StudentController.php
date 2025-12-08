@@ -20,18 +20,18 @@ class StudentController extends Controller
 
         if(!$student) return "Error: Data Profile Siswa tidak ditemukan.";
 
-        // Ambil jenjang kelas (misal "10" dari "10-IPA")
         $studentGradeLevel = explode('-', $student->class_grade)[0];
 
-        // Daftar Nama Mapel Wajib (Harus sama persis dengan di Database)
         $wajibTaken = [
-            'Pendidikan Agama dan Budi Pekerti', 
-            'Pendidikan Pancasila dan Kewarganegaraan', 
-            'Bahasa Indonesia', 
-            'Bahasa Inggris', 
-            'Matematika (Wajib)', 
-            'PJOK', 
-            'Sejarah'
+            'Pendidikan Agama dan Budi Pekerti',
+            'Pendidikan Pancasila dan Kewarganegaraan',
+            'Bahasa Indonesia',
+            'Matematika (Wajib)',
+            'Sejarah Indonesia',
+            'Bahasa Inggris',
+            'Seni Budaya',
+            'PJOK',
+            'PKWU'
         ];
 
         // ---------------------------------------------------------
@@ -83,7 +83,6 @@ class StudentController extends Controller
     // ==========================================================
     private function autoEnrollWajib($student, $gradeLevel, $wajibNames)
     {
-        // 1. Ambil semua jadwal mata pelajaran WAJIB untuk jenjang ini
         $availableWajibSchedules = Schedule::whereHas('subject', function($q) use ($wajibNames) {
             $q->whereIn('name', $wajibNames);
         })
@@ -91,30 +90,23 @@ class StudentController extends Controller
         ->with('subject')
         ->get();
 
-        // 2. Cek satu per satu mapel wajib
         foreach ($wajibNames as $wajibName) {
-            // Normalisasi nama wajib
             $targetName = strtolower(preg_replace('/\s+/', '', $wajibName));
 
-            // Cek apakah siswa SUDAH punya mapel ini?
             $hasMapel = $student->schedules()->get()->contains(function($s) use ($targetName) {
                 return strtolower(preg_replace('/\s+/', '', $s->subject->name)) === $targetName;
             });
 
-            // JIKA BELUM PUNYA, CARIKAN JADWALNYA & MASUKKAN
             if (!$hasMapel) {
-                // Cari jadwal yang namanya cocok
                 $scheduleToTake = $availableWajibSchedules->first(function($s) use ($targetName) {
                     return strtolower(preg_replace('/\s+/', '', $s->subject->name)) === $targetName;
                 });
 
                 if ($scheduleToTake) {
-                    // Masukkan ke jadwal siswa (Attach)
-                    // Kita pakai try-catch biar kalau ada error duplikat id tidak crash
                     try {
                         $student->schedules()->attach($scheduleToTake->id);
                     } catch (\Exception $e) {
-                        // Ignore error (mungkin race condition atau data kotor)
+                        // Skip
                     }
                 }
             }
@@ -131,27 +123,22 @@ class StudentController extends Controller
 
         if (!$student) return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
 
-        // Ambil jenjang kelas siswa (misal "XI" dari "XI-1")
         $gradeLevel = explode('-', $student->class_grade)[0];
 
-        // Ambil jadwal siswa
         $rawSchedules = $student->schedules()
             ->with('subject')
             ->get();
 
-        // Untuk setiap schedule, load materi yang sesuai grade_level
         $schedules = $rawSchedules->map(function($schedule) use ($gradeLevel) {
             $materials = \App\Models\Material::where('subject_id', $schedule->subject->id)
                 ->where('grade_level', $gradeLevel)
                 ->latest()
                 ->get();
             
-            // Tambahkan materials sebagai property temporary
             $schedule->materials = $materials;
             return $schedule;
         });
 
-        // Filter unik berdasarkan subject
         $enrolledSchedules = $schedules->unique(function($item) {
             return strtolower(preg_replace('/\s+/', '', $item->subject->name));
         })->values();
@@ -169,9 +156,7 @@ class StudentController extends Controller
         
         if(!$schedule) return back()->with('error', 'Jadwal tidak ditemukan');
 
-        // Validasi Duplikat Nama Mapel
         $targetName = strtolower(preg_replace('/\s+/', '', $schedule->subject->name));
-        
         $alreadyHasName = $student->schedules()->get()->contains(function ($enrolled) use ($targetName) {
             return strtolower(preg_replace('/\s+/', '', $enrolled->subject->name)) === $targetName;
         });
@@ -186,6 +171,14 @@ class StudentController extends Controller
 
         try {
             $student->schedules()->attach($request->schedule_id);
+
+            $currentTotal = $student->schedules()->count();
+
+            if ($currentTotal >= 12) {
+                return back()
+                    ->with('success', 'Berhasil mengambil mata pelajaran!')
+                    ->with('warning_full', true); 
+            }
             return back()->with('success', 'Berhasil mengambil mata pelajaran!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengambil mapel.');
@@ -225,22 +218,11 @@ class StudentController extends Controller
         $validated = $request->validate([
             'fullname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'photo' => 'nullable|image|max:2048',
         ]);
 
         try {
             $user->update(['email' => $validated['email']]);
             $student->update(['fullname' => $validated['fullname']]);
-
-            if ($request->hasFile('photo')) {
-                if ($student->photo && Storage::exists('public/' . $student->photo)) {
-                    Storage::delete('public/' . $student->photo);
-                }
-                $path = $request->file('photo')->store('students', 'public');
-                $student->update(['photo' => $path]);
-            }
-
-            return back()->with('success', 'Profil diperbarui!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal update: ' . $e->getMessage());
         }
