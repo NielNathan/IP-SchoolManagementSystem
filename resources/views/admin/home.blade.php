@@ -49,10 +49,6 @@
             <h1>🛡️ Administrator Panel</h1>
             <div style="display: flex; gap: 10px;">
                 <a href="{{ route('admin.schedules.index') }}" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #2563eb; justify-content: center; align-items: center; display: flex;">Edit Jadwal</a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" style="background-color: #ef4444; color: white; padding: 12px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13.3px; border: 1px solid #ef4444; justify-content: center; align-items: center; display: flex;">Logout</button>
-                </form>
             </div>
         </div>
 
@@ -78,9 +74,8 @@
                     <tr>
                         <th width="25%">Mata Pelajaran</th>
                         <th width="25%">Guru</th>
-                        <th width="20%">Waktu</th>
-                        <th width="15%">Jumlah</th>
-                        <th width="15%">Aksi</th>
+                        <th width="25%">Jumlah</th>
+                        <th width="25%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,10 +85,6 @@
                         <td>@foreach($class->multi_instructors as $guru)
                                 {{ $guru->fullname }}<br>
                             @endforeach
-                        </td>
-                        <td>
-                            {{ $class->day }}, 
-                            {{ substr($class->time_start, 0, 5) }} - {{ substr($class->time_end, 0, 5) }}
                         </td>
                         <td>{{ count($class->multi_students) }} Siswa</td>
                         <td><button class="btn-view" onclick="openModal('modal-{{ $class->id }}')">Lihat Siswa</button></td>

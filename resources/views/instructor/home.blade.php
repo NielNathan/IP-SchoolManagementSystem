@@ -43,38 +43,116 @@
         .class-card h3 { margin: 0 0 10px; color: #2563eb; }
         .class-info { background: #f9fafb; padding: 10px; border-radius: 6px; font-size: 14px; color: #374151; font-weight: 600; margin-bottom: 15px; }
         
-        /* Student List */
-        .student-list { margin: 0; padding-left: 20px; }
-        .student-list li { margin-bottom: 5px; color: #4b5563; }
-        .empty-msg { color: #9ca3af; font-style: italic; }
-
-        /* Student List Styling */
-        .student-list li {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            margin-bottom: 8px; 
-            padding-right: 10px; 
-        }
-
-        /* Kick Button Styling */
-        .btn-kick { 
-            background-color: #ef4444; 
+        /* Button untuk Daftar Siswa */
+        .btn-view-students {
+            background-color: #10b981;
             color: white;
             border: none;
-            padding: 4px 10px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-view-students:hover { background-color: #059669; }
+
+        /* Modal Styles */
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 24px; 
+            width: 90%; 
+            max-width: 600px; 
+            max-height: 80vh; 
+            overflow-y: auto; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+        }
+        
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+        }
+        .modal-header h3 { margin: 0; color: #111827; font-size: 18px; }
+        .modal-close { 
+            background: none; 
+            border: none; 
+            font-size: 28px; 
+            cursor: pointer; 
+            color: #6b7280; 
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-subject-info {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1e40af;
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        .modal-table thead {
+            background-color: #f3f4f6;
+        }
+        .modal-table th {
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 12px;
+        }
+        .modal-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+            font-size: 13px;
+        }
+
+        .btn-kick-modal {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 12px; 
-            margin-left: 15px; 
+            font-size: 11px;
             transition: background-color 0.2s;
-            flex-shrink: 0; 
+        }
+        .btn-kick-modal:hover { background-color: #dc2626; }
+
+        .modal-empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 20px;
+            font-size: 14px;
         }
 
-        .btn-kick:hover {
-            background-color: #dc2626;
-        }
     </style>
 </head>
 <body>
@@ -106,117 +184,129 @@
         @else
             @foreach($myClasses as $class)
                 <div class="class-card">
-                    <h3>Mata Pelajaran: {{ $class->subject->name }}</h3>
-                    
-                    <div class="class-info">
-                        Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time_start }} - {{ $class->time_end }} &nbsp;|&nbsp; Kelas: {{ $class->grade_level }}
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                        <div style="flex:1;">
+                            <h3 style="margin:0 0 8px;">{{ $class->subject->name }}</h3>
+                            <div class="class-info">
+                                Hari: {{ $class->day }} &nbsp;|&nbsp; Jam: {{ $class->time_start }} - {{ $class->time_end }} &nbsp;|&nbsp; Kelas: {{ $class->grade_level }}
+                            </div>
+                        </div>
+                        <button class="btn-view-students" type="button" data-class-id="{{ $class->id }}" data-class-name="{{ $class->subject->name }}" data-class-day="{{ $class->day }}" data-class-time="{{ substr($class->time_start, 0, 5) }}-{{ substr($class->time_end, 0, 5) }}" data-class-grade="{{ $class->grade_level }}" data-students="{{ json_encode($class->students->map(function($s){ return ['id' => $s->id, 'nis' => $s->nis, 'name' => $s->fullname, 'grade' => $s->class_grade]; })->values()) }}">
+                            Lihat Siswa
+                        </button>
                     </div>
-
-                    <strong>Daftar Siswa ({{ $class->students->count() }} Siswa):</strong>
-                    <br><br>
-
-                    @if($class->students->isEmpty())
-                        <p class="empty-msg">Belum ada siswa yang mengambil kelas ini.</p>
-                    @else
-                        <ol class="student-list">
-                            @foreach($class->students as $student)
-                                <li id="student-row-{{ $student->nis }}-{{ $class->id }}"> 
-                                    
-                                    <span>
-                                        <strong>{{ $student->fullname }}</strong> 
-                                        (NIS: {{ $student->nis }}) - Kelas {{ $student->class_grade }}
-                                    </span>
-                                    
-                                    <button
-                                        type="button"
-                                        class="btn-kick"
-                                        data-nis="{{ $student->nis }}"
-                                        data-class-id="{{ $class->id }}"
-                                        data-student-name="{{ $student->fullname }}"
-                                    >
-                                        Keluarkan
-                                    </button>
-                                </li>
-                            @endforeach
-                        </ol>
-                    @endif
                 </div>
             @endforeach
         @endif
 
     </div>
+
+    <!-- Modal untuk Daftar Siswa -->
+    <div class="modal-overlay" id="studentsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Daftar Siswa</h3>
+                <button class="modal-close" type="button" onclick="closeStudentsModal()">×</button>
+            </div>
+            
+            <div id="modalStudentsList"></div>
+        </div>
+    </div>
     
     <script>
+    function openStudentsModal(btn) {
+        const className = $(btn).data('class-name');
+        let students = $(btn).data('students');
+        
+        if (typeof students === 'string') {
+            try {
+                students = JSON.parse(students);
+            } catch(e) {
+                students = [];
+            }
+        }
+        
+        $('#modalTitle').text('Daftar Siswa - ' + className);
+        
+        // Build table
+        let html = '';
+        if (!students || students.length === 0) {
+            html = '<p class="modal-empty">Belum ada siswa yang terdaftar pada mata pelajaran ini.</p>';
+        } else {
+            html = '<table class="modal-table"><thead><tr><th>Nama</th><th>NIS</th><th>Kelas</th><th style="text-align:center; width:70px;">Aksi</th></tr></thead><tbody>';
+            students.forEach(s => {
+                html += '<tr id="modal-student-' + s.id + '"><td>' + s.name + '</td><td>' + s.nis + '</td><td>' + s.grade + '</td><td style="text-align:center;"><button class="btn-kick-modal" type="button" data-student-id="' + s.id + '" data-nis="' + s.nis + '" data-class-id="' + $(btn).data('class-id') + '" data-student-name="' + s.name + '">Keluarkan</button></td></tr>';
+            });
+            html += '</tbody></table>';
+        }
+        
+        $('#modalStudentsList').html(html);
+        $('#studentsModal').addClass('active');
+    }
+    
+    function closeStudentsModal() {
+        $('#studentsModal').removeClass('active');
+    }
+    
     $(document).ready(function() {
-        $('.btn-kick').on('click', function() {
-            var button = $(this);
-            var nis = button.data('nis');
-            var classId = button.data('class-id');
-            var studentName = button.data('student-name');
+        // Open modal when clicking view students button
+        $('.btn-view-students').on('click', function() {
+            openStudentsModal(this);
+        });
+        
+        // Close modal when clicking outside
+        $('#studentsModal').on('click', function(e) {
+            if (e.target === this) {
+                closeStudentsModal();
+            }
+        });
+        
+        // Handle kick student from modal
+        $(document).on('click', '.btn-kick-modal', function(e) {
+            e.preventDefault();
+            const btn = $(this);
+            const studentId = btn.data('student-id');
+            const nis = btn.data('nis');
+            const classId = btn.data('class-id');
+            const studentName = btn.data('student-name');
             
-            // SweetAlert Konfirmasi
             Swal.fire({
-                title: 'Konfirmasi Pengeluaran Siswa',
-                html: 'Apakah Anda yakin ingin mengeluarkan **' + studentName + '** (NIS: ' + nis + ') dari mata pelajaran ini?',
+                title: 'Keluarkan Siswa?',
+                text: 'Apakah Anda yakin ingin mengeluarkan ' + studentName + ' dari mata pelajaran ini?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3741',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Keluarkan!',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Keluarkan',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    
-                    // Loading State
-                    Swal.fire({
-                        title: 'Memproses...',
-                        text: 'Mohon tunggu sebentar.',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
-                    
-                    button.prop('disabled', true);
-                    
-                    // AJAX Request
                     $.ajax({
-                        url: '{{ route('instructor.kick_student') }}', 
+                        url: '{{ route("instructor.kick_student") }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
                             nis: nis,
-                            class_id: classId 
+                            class_id: classId
                         },
                         success: function(response) {
-                            Swal.close(); 
-                            button.prop('disabled', false);
-                            
                             if (response.success) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil!',
-                                    text: response.message || studentName + ' berhasil dikeluarkan!'
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
                                 });
-                                
-                                $('#student-row-' + nis + '-' + classId).fadeOut(300, function() {
+                                $('#modal-student-' + studentId).fadeOut(300, function() {
                                     $(this).remove();
                                 });
-                                
                             } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Gagal!',
-                                    text: response.message || 'Terjadi kesalahan.'
-                                });
+                                Swal.fire({icon: 'error', title: 'Gagal!', text: response.message});
                             }
                         },
-                        error: function(xhr) {
-                            Swal.close();
-                            button.prop('disabled', false);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: 'Terjadi kesalahan koneksi atau server.'
-                            });
+                        error: function() {
+                            Swal.fire({icon: 'error', title: 'Error!', text: 'Terjadi kesalahan koneksi.'});
                         }
                     });
                 }
@@ -224,5 +314,6 @@
         });
     });
     </script>
+
 </body>
 </html>

@@ -163,7 +163,7 @@ input[type="file"]:focus {
 
 @section('content')
 <div class="card">
-    <h1>✏️ Edit Profil</h1>
+    <h1>✏️ Edit Profile</h1>
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -193,23 +193,9 @@ input[type="file"]:focus {
         @method('PUT')
 
         <!-- Photo Section -->
-        <div class="photo-section">
+        <div class="photo-section" style="justify-content: center; align-items: center; font-size: 48px; color: #9ca3af; background: white;">
             <div class="photo-preview">
-                @if($student->photo)
-                    <img src="{{ asset('storage/' . $student->photo) }}" alt="Foto {{ $student->fullname }}">
-                @else
                     <span>👤</span>
-                @endif
-            </div>
-            <div class="photo-upload">
-                <label for="photo">📸 Foto Profil</label>
-                <input type="file" id="photo" name="photo" accept="image/*">
-                <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-                    Maksimal 2MB. Format: JPEG, PNG, JPG, GIF
-                </p>
-                @error('photo')
-                    <div class="error-text">{{ $message }}</div>
-                @enderror
             </div>
         </div>
 
@@ -260,10 +246,10 @@ input[type="file"]:focus {
 
         <div class="button-group">
             <a href="{{ route('student.dashboard') }}" class="btn btn-secondary">
-                ❌ Batal
+                Batal
             </a>
             <button type="submit" class="btn btn-primary">
-                ✅ Simpan Perubahan
+                Simpan Perubahan
             </button>
         </div>
         </form>

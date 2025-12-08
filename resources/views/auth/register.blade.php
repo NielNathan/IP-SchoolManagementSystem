@@ -41,12 +41,12 @@ input[type=text],input[type=password],input[type=email],select{width:100%;paddin
         
         <div>
             <label for="fullname">Nama Lengkap</label>
-            <input id="fullname" name="fullname" type="text" value="{{ old('fullname') }}" placeholder="Cth: James Bond" required autofocus>
+            <input id="fullname" name="fullname" type="text" value="{{ old('fullname') }}" required autofocus>
         </div>
 
         <div>
             <label for="nis">NIS (Nomor Induk Siswa)</label>
-            <input id="nis" name="nis" type="text" value="{{ old('nis') }}" placeholder="Cth: 2025001" required>
+            <input id="nis" name="nis" type="text" value="{{ old('nis') }}" required>
         </div>
 
         <div>
@@ -70,7 +70,7 @@ input[type=text],input[type=password],input[type=email],select{width:100%;paddin
 
         <div>
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="nama@sekolah.com" required>
+            <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="nama@school.com" required>
         </div>
 
         <div>

@@ -2,7 +2,6 @@
     <div class="header-inner">
         <a class="brand" href="{{ url('/') }}">
             @if (file_exists(public_path('images/logo.svg')))
-                {{-- inline SVG may already include the school name, so do not duplicate text --}}
                 {!! file_get_contents(public_path('images/logo.svg')) !!}
             @elseif (file_exists(public_path('images/logo.png')))
                 <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'IP School') }} logo">

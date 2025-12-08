@@ -150,10 +150,6 @@
 @section('content')
 
 <div class="card">
-    <a href="{{ route('student.dashboard') }}" class="nav-btn nav-btn-secondary" style="margin-bottom: 20px;">
-         Kembali
-    </a>
-
     <h1 style="color: #111827; font-size: 28px; margin-bottom: 30px;">📚 Materi Siswa</h1>
     
     @forelse($enrolledSchedules as $schedule)
@@ -186,7 +182,7 @@
                                 
                                 <div class="material-meta">
                                     <span>📅 {{ \Carbon\Carbon::parse($material->created_at)->format('d M Y') }}</span>
-                                    <span>📦 {{ strtoupper($ext) }}</span>
+                                    <span>{{ strtoupper($ext) }}</span>
                                 </div>
 
                                 <a href="{{ route('materials.show', $material->id) }}" class="download-btn" download>
