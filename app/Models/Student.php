@@ -8,7 +8,8 @@ class Student extends Model
         'user_id',
         'nis',
         'fullname',
-        'class_grade', // <- PENTING! Ini nama kolom yg benar
+        'class_grade',
+        'phone',
     ];
 
     // Relasi balik ke User

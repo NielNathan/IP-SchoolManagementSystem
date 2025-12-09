@@ -218,11 +218,20 @@ class StudentController extends Controller
         $validated = $request->validate([
             'fullname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone'    => 'nullable|string|max:20',
         ]);
 
         try {
-            $user->update(['email' => $validated['email']]);
-            $student->update(['fullname' => $validated['fullname']]);
+            $user->update([
+                'email' => $validated['email']
+            ]);
+
+            $student->update([
+                'fullname' => $validated['fullname'],
+                'phone'    => $request->phone 
+            ]);
+
+            return redirect()->route('student.edit-profile')->with('success', 'Profil berhasil diperbarui!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal update: ' . $e->getMessage());
         }

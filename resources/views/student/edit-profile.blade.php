@@ -220,7 +220,7 @@ input[type="file"]:focus {
 
         <div class="form-group">
             <label for="phone">📞 Nomor Telepon</label>
-            <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Opsional">
+            <input type="tel" id="phone" name="phone" value="{{ old('phone', $student->phone) }}" placeholder="Opsional">
             @error('phone')
                 <div class="error-text">{{ $message }}</div>
             @enderror
