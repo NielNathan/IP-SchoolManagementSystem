@@ -1,3 +1,5 @@
+@extends('layouts.app')
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -59,7 +61,7 @@
     @include('partials.header-home')
 
     <div class="container">
-        <h1>📤 Upload Materi Baru</h1>
+        <h1 font>📤 Upload Materi Baru</h1>
 
         @if(session('success'))
             <div class="alert-success">

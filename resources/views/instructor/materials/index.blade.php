@@ -4,7 +4,7 @@
 
 @section('custom-styles')
 .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-h1 { color: white; font-size: 28px; margin-bottom: 30px; text-align: center; }
+h1 { color: blaack; font-size: 28px; margin-bottom: 30px; text-align: center; }
 .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-block; transition: all 0.3s ease; }
 .btn-primary { background: #2563eb; color: white; }
 .btn-primary:hover { background: #1e40af; }

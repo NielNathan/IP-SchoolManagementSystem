@@ -39,13 +39,13 @@
     <style>
         /* header with blue background and fixed on top - allows scrolling */
         .site-header-home{
-            position:fixed;
-            left:0;right:0;top:0;z-index:60;
-            display:flex;justify-content:center;align-items:center;
-            background:#2563eb;
-            padding:8px 16px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-        }
+    position:fixed;
+    left:0;right:0;top:0;z-index:60;
+    display:flex;justify-content:center;align-items:center;
+    background:#2563eb;
+    padding:14px 24px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
         .header-inner{
             width:100%;
             max-width:1200px;
@@ -54,24 +54,7 @@
             gap:20px;
             justify-content:space-between;
         }
-        .brand{
-            display:flex;
-            align-items:center;
-            gap:12px;
-            text-decoration:none;
-            flex-shrink:0;
-        }
-        .brand img{
-            height:64px;
-            width:auto;
-            display:block;
-            border-radius:6px;
-        }
-        .brand svg{
-            width:auto;
-            height:64px;
-            display:block;
-        }
+        
         .school-name{
             font-size:18px;
             font-weight:600;
@@ -87,16 +70,15 @@
             margin:0 20px;
         }
         .nav-item{
-            color:rgba(255,255,255,0.8);
-            text-decoration:none;
-            padding:8px 16px;
-            border-radius:6px;
-            font-size:14px;
-            font-weight:500;
-            transition:all 0.3s ease;
-            white-space:nowrap;
-            font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial;
-        }
+    color:rgba(255,255,255,0.8);
+    text-decoration:none;
+    padding:10px 20px;
+    border-radius:6px;
+    font-size:15px;
+    font-weight:500;
+    transition:all 0.3s ease;
+    white-space:nowrap;
+}
         .nav-item:hover{
             background:rgba(255,255,255,0.15);
             color:white;
@@ -123,24 +105,23 @@
         .logout-form{
             margin:0;
         }
-        .logout-btn{
-            background:#ef4444;
-            color:white;
-            border:none;
-            padding:8px 16px;
-            border-radius:6px;
-            cursor:pointer;
-            font-weight:600;
-            font-size:13px;
-            transition:background 0.3s ease;
-            font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial;
-        }
+        
+.logout-btn{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+}
         .logout-btn:hover{
             background:#dc2626;
         }
 
         /* push page content down so header doesn't overlap - allow scroll */
-        body{padding-top:88px}
+        body{ padding-top:100px }
 
         @media (max-width:768px){
             .header-inner{

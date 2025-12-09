@@ -19,7 +19,7 @@
             left:0;right:0;top:0;z-index:60;
             display:flex;justify-content:center;align-items:center;
             background:#2563eb;
-            padding:8px 16px;
+            padding:22px 30px;
             box-shadow:0 2px 8px rgba(0,0,0,0.08);
         }
         .header-inner{
@@ -28,24 +28,6 @@
             display:flex;
             align-items:center;
             gap:20px;
-        }
-        .brand{
-            display:flex;
-            align-items:center;
-            gap:12px;
-            text-decoration:none;
-            flex-shrink:0;
-        }
-        .brand img{
-            height:64px;
-            width:auto;
-            display:block;
-            border-radius:6px;
-        }
-        .brand svg{
-            width:auto;
-            height:64px;
-            display:block;
         }
         .school-name{
             font-size:18px;
