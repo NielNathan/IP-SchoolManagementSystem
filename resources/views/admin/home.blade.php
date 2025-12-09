@@ -162,7 +162,7 @@
                                 {{-- Tombol Reset (Hanya muncul jika sudah final) --}}
                                 {{-- Jika admin ingin reset kapan saja, hilangkan if-nya --}}
                                 @if($student->is_schedule_finalized)
-                                    <form action="{{ route('admin.student.reset', $student->id) }}" method="POST" onsubmit="return confirm('Reset status jadwal siswa {{ $student->fullname }}? Siswa akan bisa mengambil/menghapus mapel lagi.');">
+                                    <form action="{{ route('admin.student.reset', $student->id) }}" method="POST" class="reset-form" data-student-name="{{ $student->fullname }}">
                                         @csrf
                                         <button type="submit" class="btn-reset" title="Buka Kunci Jadwal">
                                             🔓 Reset
@@ -182,6 +182,32 @@
         function openModal(id) { document.getElementById(id).style.display = "block"; document.body.style.overflow = "hidden"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; document.body.style.overflow = "auto"; }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) { e.target.style.display = "none"; document.body.style.overflow = "auto"; } }
+    </script>
+    <!-- SweetAlert2 for admin reset actions -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('form.reset-form').forEach(function(form){
+                form.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    var name = form.dataset.studentName || 'siswa ini';
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        html: '<div style="text-align:left">Reset status jadwal untuk <strong>' + name + '</strong>?<br><small>Siswa akan bisa mengambil/menghapus mapel lagi.</small></div>',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, reset sekarang',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then(function(result){
+                        if(result.isConfirmed){
+                            Swal.fire({ title: 'Sedang memproses...', allowOutsideClick:false, didOpen: () => { Swal.showLoading(); } });
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>

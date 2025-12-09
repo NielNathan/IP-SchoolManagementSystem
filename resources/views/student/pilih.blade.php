@@ -93,8 +93,8 @@
                             <span style="color: #059669; font-size: 12px; font-weight: 600;">✓ Terambil</span>
                         @elseif(in_array($my->subject->name, $wajibTaken))
                             <span style="color: #9ca3af; font-size: 12px; font-style: italic;">🔒 Wajib</span>
-                        @else
-                            <form action="{{ route('student.unenroll') }}" method="POST" onsubmit="return confirm('Yakin ingin membatalkan mapel ini?');">
+                            @else
+                                <form action="{{ route('student.unenroll') }}" method="POST" class="unenroll-form">
                                 @csrf
                                 <input type="hidden" name="schedule_id" value="{{ $my->id }}">
                                 <button type="submit" class="btn-action btn-delete">Hapus</button>
@@ -109,7 +109,7 @@
 
     @if(!$isFinal)
     <div class="submit-section submit-warning">
-        <form action="{{ route('student.schedule.finalize') }}" method="POST" onsubmit="return confirm('APAKAH ANDA YAKIN? Jadwal akan dikunci permanen.');">
+        <form action="{{ route('student.schedule.finalize') }}" method="POST" class="finalize-form">
             @csrf
             <button type="submit" class="btn-final">
                 🔒 Submit & Finalisasi Jadwal
@@ -151,7 +151,7 @@
                     @if($isFinal)
                          <button type="button" class="btn-action btn-locked" disabled>🔒 Terkunci</button>
                     @else
-                        <form action="{{ route('student.enroll') }}" method="POST">
+                        <form action="{{ route('student.enroll') }}" method="POST" class="enroll-form">
                             @csrf
                             <input type="hidden" name="schedule_id" value="{{ $sched->id }}">
                             
@@ -175,4 +175,71 @@
     </table>
 
 </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('form.finalize-form').forEach(function(form){
+                form.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: 'Jadwal akan dikunci permanen',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, kunci sekarang',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then(function(result){
+                        if(result.isConfirmed){
+                            Swal.fire({ title: 'Sedang memproses...', allowOutsideClick:false, didOpen: () => { Swal.showLoading(); } });
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('form.enroll-form').forEach(function(form){
+                form.addEventListener('submit', function(e){
+                    var btn = form.querySelector('button[type=submit]');
+                    if(btn && btn.disabled) return e.preventDefault();
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Ambil Mata Pelajaran?',
+                        text: 'Anda akan menambahkan mata pelajaran ini ke jadwal Anda.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ambil',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then(function(result){
+                        if(result.isConfirmed){
+                            Swal.fire({ title: 'Sedang memproses...', allowOutsideClick:false, didOpen: () => { Swal.showLoading(); } });
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('form.unenroll-form').forEach(function(form){
+                form.addEventListener('submit', function(e){
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Yakin ingin membatalkan?',
+                        text: 'Mapel ini akan dihapus dari jadwal Anda.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, hapus',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then(function(result){
+                        if(result.isConfirmed){
+                            Swal.fire({ title: 'Sedang memproses...', allowOutsideClick:false, didOpen: () => { Swal.showLoading(); } });
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

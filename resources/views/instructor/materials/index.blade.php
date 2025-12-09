@@ -68,7 +68,7 @@ th { background-color: #f9fafb; font-weight: 600; color: #374151; }
                             <a href="{{ route('instructor.materials.edit', $material->id) }}" class="btn btn-warning">
                                 ✏️ Edit
                             </a>
-                            <form action="{{ route('instructor.materials.delete', $material->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus materi ini?');">
+                            <form action="{{ route('instructor.materials.delete', $material->id) }}" method="POST" style="display: inline;" class="delete-material-form" data-material-title="{{ $material->title }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">🗑️ Hapus</button>
@@ -87,4 +87,31 @@ th { background-color: #f9fafb; font-weight: 600; color: #374151; }
         </a>
     </div>
 </div>
+
+<!-- SweetAlert2 for delete material confirmation -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('form.delete-material-form').forEach(function(form){
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                var title = form.dataset.materialTitle || 'materi ini';
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    html: '<div style="text-align:left">Menghapus materi <strong>' + title + '</strong>?<br><small>Tindakan ini tidak dapat dibatalkan.</small></div>',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus sekarang',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then(function(result){
+                    if(result.isConfirmed){
+                        Swal.fire({ title: 'Sedang menghapus...', allowOutsideClick:false, didOpen: () => { Swal.showLoading(); } });
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection
