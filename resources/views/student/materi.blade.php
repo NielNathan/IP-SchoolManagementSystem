@@ -181,7 +181,7 @@
                                 <div class="material-title">{{ $material->title }}</div>
                                 
                                 <div class="material-meta">
-                                    <span>📅 {{ \Carbon\Carbon::parse($material->created_at)->format('d M Y') }}</span>
+                                    <span>📅 {{ Carbon::parse($material->created_at)->format('d M Y') }}</span>
                                     <span>{{ strtoupper($ext) }}</span>
                                 </div>
 

@@ -54,8 +54,6 @@
             </div>
         @endif
 
-        {{-- SweetAlert messages will be shown by the script included at bottom --}}
-
         <div class="table-container">
             <table>
                 <thead>
@@ -209,6 +207,7 @@
         </div>
     </div>
 
+    <!-- Modal -->
     <script>
         function openCreateModal() { document.getElementById('createModal').style.display = 'block'; }
         
@@ -235,6 +234,7 @@
         }
     </script>
     
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 

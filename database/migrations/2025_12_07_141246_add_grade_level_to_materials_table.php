@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('materials', function (Blueprint $table) {
-            $table->string('grade_level')->nullable(); // Jenjang kelas (X, XI, XII)
+            $table->string('grade_level')->nullable();
         });
     }
 

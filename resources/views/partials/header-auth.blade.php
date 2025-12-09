@@ -13,7 +13,6 @@
     </div>
 
     <style>
-        /* header with blue background and fixed on top - allows scrolling */
         .site-header-auth{
             position:fixed;
             left:0;right:0;top:0;z-index:60;
@@ -36,7 +35,6 @@
             font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial;
         }
 
-        /* push page content down so header doesn't overlap - allow scroll */
         body{padding-top:88px}
 
         @media (max-width:768px){

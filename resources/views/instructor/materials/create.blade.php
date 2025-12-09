@@ -12,8 +12,7 @@
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
         h1 { margin: 0 0 20px 0; color: #111827; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
-        
-        /* Form Styles */
+    
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
         
@@ -36,7 +35,6 @@
 
         .helper-text { font-size: 12px; color: #6b7280; margin-top: 5px; }
 
-        /* Buttons */
         .btn-group { display: flex; gap: 10px; margin-top: 30px; }
         
         .btn-save {
@@ -51,7 +49,6 @@
         }
         .btn-back:hover { background-color: #6b7280; }
 
-        /* Alert Success */
         .alert-success {
             background-color: #d1fae5; color: #065f46; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #a7f3d0;
         }
@@ -99,7 +96,7 @@
 
             <div class="form-group">
                 <label for="file">File Materi</label>
-                <input type="file" name="file" id="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip" required>
+                <input type="file" name="file" id="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip" required> <!-- Format yang didukung -->
                 <p class="helper-text">*Format yang didukung: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, JPG, PNG, MP4, ZIP (Max: 50MB)</p>
             </div>
 

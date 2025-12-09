@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subject;
+use App\Models\Material;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Schedule;
-use App\Models\Subject;
 
 class StudentController extends Controller
 {
-    // ==========================================================
-    // 1. HALAMAN UTAMA (JADWAL SAYA & PILIH KELAS)
-    // ==========================================================
     public function index()
     {
         $user = Auth::user();
@@ -34,14 +32,9 @@ class StudentController extends Controller
             'PKWU'
         ];
 
-        // ---------------------------------------------------------
-        // FITUR BARU: AUTO-ASSIGN MAPEL WAJIB
-        // ---------------------------------------------------------
+        // Auto Enroll Mata Pelajaran Wajib
         $this->autoEnrollWajib($student, $studentGradeLevel, $wajibTaken);
-        // ---------------------------------------------------------
 
-        // --- 1. AMBIL JADWAL SAYA (YANG SUDAH DIAMBIL/AUTO-ASSIGNED) ---
-        // Refresh data jadwal setelah auto-enroll
         $rawSchedules = $student->schedules()->with(['subject', 'instructor'])->get();
         
         // Filter Tampilan (Satu mapel cukup tampil sekali)
@@ -54,12 +47,10 @@ class StudentController extends Controller
             return strtolower(preg_replace('/\s+/', '', $item->subject->name));
         })->toArray();
 
-        // --- 2. AMBIL JADWAL TERSEDIA ---
         $allSchedulesRaw = Schedule::with(['subject', 'instructor'])
             ->where('grade_level', $studentGradeLevel)
             ->get();
 
-        // --- 3. FILTER DAFTAR PILIHAN ---
         // Buang jadwal yang namanya sudah ada di jadwal saya
         $allSchedules = $allSchedulesRaw->reject(function ($item) use ($takenNamesNormalized) {
             $name = strtolower(preg_replace('/\s+/', '', $item->subject->name));
@@ -78,9 +69,10 @@ class StudentController extends Controller
         ));
     }
 
-    // ==========================================================
-    // FUNGSI BANTUAN: AUTO ENROLL LOGIC
-    // ==========================================================
+    // Kembali ke index
+    public function pilih() { return $this->index(); }
+
+    // Auto enroll mata pelajaran wajib jika belum diambil
     private function autoEnrollWajib($student, $gradeLevel, $wajibNames)
     {
         $availableWajibSchedules = Schedule::whereHas('subject', function($q) use ($wajibNames) {
@@ -113,9 +105,7 @@ class StudentController extends Controller
         }
     }
 
-    // ==========================================================
-    // 2. HALAMAN MATERI
-    // ==========================================================
+    // Halaman Materi
     public function materi()
     {
         $user = Auth::user();
@@ -130,7 +120,7 @@ class StudentController extends Controller
             ->get();
 
         $schedules = $rawSchedules->map(function($schedule) use ($gradeLevel) {
-            $materials = \App\Models\Material::where('subject_id', $schedule->subject->id)
+            $materials = Material::where('subject_id', $schedule->subject->id)
                 ->where('grade_level', $gradeLevel)
                 ->latest()
                 ->get();
@@ -146,9 +136,7 @@ class StudentController extends Controller
         return view('student.materi', compact('enrolledSchedules'));
     }
 
-    // ==========================================================
-    // 3. PROSES AMBIL & BATAL KELAS
-    // ==========================================================
+    // Mengambil Mata Pelajaran
     public function enroll(Request $request)
     {
         $student = Auth::user()->student;
@@ -185,6 +173,7 @@ class StudentController extends Controller
         }
     }
 
+    // Menghapus Mata Pelajaran
     public function unenroll(Request $request)
     {
         $student = Auth::user()->student;
@@ -192,16 +181,13 @@ class StudentController extends Controller
         return back()->with('success', 'Mata pelajaran berhasil dihapus dari jadwal.');
     }
 
-    // ==========================================================
-    // 4. PROFIL & LAINNYA
-    // ==========================================================
+    // Profil Siswa
     public function dashboard() {
         $user = Auth::user();
         $student = $user->student;
         return view('student.dashboard', compact('student')); 
     
     }
-    public function pilih() { return $this->index(); }
 
     public function editProfile()
     {
@@ -237,6 +223,7 @@ class StudentController extends Controller
         }
     }
 
+    // Submit finalisasi jadwal sehingga tidak bisa diubah lagi
     public function finalizeSchedule()
     {
         $user = Auth::user();

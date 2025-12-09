@@ -88,7 +88,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb
                     <br><small style="color: #9ca3af;">Pilih file baru di bawah untuk mengganti, atau kosongkan untuk tetap menggunakan file saat ini.</small>
                 </div>
             @endif
-            <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip">
+            <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip"> <!-- Format yang didukung -->
             @error('file') <span class="error-message">{{ $message }}</span> @enderror
             <small style="color: #6b7280; display: block; margin-top: 4px;">
                 Format yang didukung: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, JPG, PNG, MP4, ZIP (Max: 50MB)

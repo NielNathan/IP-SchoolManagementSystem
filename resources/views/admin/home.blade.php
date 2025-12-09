@@ -62,8 +62,6 @@
     @include('partials.header-home')
 
     <div class="container">
-        
-        {{-- Flash Message Admin --}}
         @if(session('success'))
             <div style="background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bbf7d0;">
                 {{ session('success') }}
@@ -141,14 +139,12 @@
                         <div class="grade-divider">SISWA KELAS {{ $level }}</div>
                         @foreach($students as $student)
                             <li>
-                                {{-- Kolom Nama & Info --}}
                                 <div style="display: flex; flex-direction: column;">
                                     <span>
                                         {{ $student->fullname }} 
                                         <small style="color:#888">({{ $student->nis ?? 'NIS' }})</small>
                                     </span>
                                     
-                                    {{-- Indikator Status & Kelas --}}
                                     <div style="margin-top: 2px;">
                                         <span class="badge-kelas">{{ $student->class_grade }}</span>
                                         @if($student->is_schedule_finalized)
@@ -159,8 +155,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Tombol Reset (Hanya muncul jika sudah final) --}}
-                                {{-- Jika admin ingin reset kapan saja, hilangkan if-nya --}}
                                 @if($student->is_schedule_finalized)
                                     <form action="{{ route('admin.student.reset', $student->id) }}" method="POST" class="reset-form" data-student-name="{{ $student->fullname }}">
                                         @csrf
@@ -178,12 +172,14 @@
     </div>
     @endforeach
 
+    <!-- Modal -->
     <script>
         function openModal(id) { document.getElementById(id).style.display = "block"; document.body.style.overflow = "hidden"; }
         function closeModal(id) { document.getElementById(id).style.display = "none"; document.body.style.overflow = "auto"; }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) { e.target.style.display = "none"; document.body.style.overflow = "auto"; } }
     </script>
-    <!-- SweetAlert2 for admin reset actions -->
+
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function(){

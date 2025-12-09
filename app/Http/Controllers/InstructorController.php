@@ -12,7 +12,7 @@ class InstructorController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $instructor = $user->instructor; //Ambil profil guru dari login
+        $instructor = $user->instructor;
 
         if(!$instructor) {
             return "Error: Akun guru ini belum punya profil NIP. Cek Seeder.";
@@ -24,6 +24,8 @@ class InstructorController extends Controller
 
         return view('instructor.home', compact('instructor', 'myClasses'));
     }
+
+    // Jika ingin mengeluarkan siswa dari mata pelajaran
     public function kickStudent(Request $request)
     {
 
@@ -54,7 +56,6 @@ class InstructorController extends Controller
         }
 
         try {
-
             $detachedCount = $schedule->students()->detach($student->id); 
             
             if ($detachedCount) {

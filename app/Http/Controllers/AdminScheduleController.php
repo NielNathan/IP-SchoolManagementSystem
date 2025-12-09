@@ -33,6 +33,7 @@ class AdminScheduleController extends Controller
 
         $subject = Subject::firstOrCreate(['name' => $request->subject_name]);
 
+        // Jika ada jadwal pelajaran yang bentrok
         $conflict = Schedule::where('day', $request->day)
             ->where('grade_level', $request->grade_level)
             ->where(function ($q) use ($request) {

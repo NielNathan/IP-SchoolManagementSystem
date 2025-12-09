@@ -13,12 +13,11 @@ use App\Http\Controllers\AdminScheduleController;
 
 Route::get('/', function () { return view('welcome'); })->name('welcome');
 
-
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.process');
+Route::post('/register-process', [AuthController::class, 'register'])->name('register.process');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'authenticate'])->name('login.process');
+Route::post('/login-process', [AuthController::class, 'authenticate'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', EnsureRoleStudent::class])->group(function () {
@@ -43,30 +42,36 @@ Route::middleware(['auth', EnsureRoleStudent::class])->group(function () {
     // Route cadangan
     Route::get('/student-pilih', [StudentController::class, 'index'])->name('student.pilih');
 
-    // --- PERBAIKAN DI SINI ---
-    // Ubah namanya menjadi 'student.schedule.finalize' agar sesuai dengan View
+    // 6. FINALIZED SCHEDULE
     Route::post('/schedule/finalize', [StudentController::class, 'finalizeSchedule'])->name('student.schedule.finalize');
 });
 
 Route::middleware(['auth', EnsureRoleTeacher::class])->group(function () {
+    // 1. DASHBOARD INSTRUKTUR
     Route::get('/instructor-dashboard', [InstructorController::class, 'index'])->name('instructor.dashboard');
+
+    // 2. MANAJEMEN MATERI
     Route::get('/upload-materi', [MaterialController::class, 'create'])->name('materials.create');
     Route::post('/upload-materi', [MaterialController::class, 'store'])->name('materials.store');
     Route::get('/materi-saya', [MaterialController::class, 'myMaterials'])->name('instructor.materials.index');
     Route::get('/materi-saya/{id}/edit', [MaterialController::class, 'editMaterial'])->name('instructor.materials.edit');
     Route::put('/materi-saya/{id}', [MaterialController::class, 'updateMaterial'])->name('instructor.materials.update');
     Route::delete('/materi-saya/{id}', [MaterialController::class, 'deleteMaterial'])->name('instructor.materials.delete');
+
+    // 3. MANAJEMEN STUDENT
     Route::post('/instructor/kick-student', [InstructorController::class, 'kickStudent'])->name('instructor.kick_student');
 });
 
 Route::middleware(['auth', EnsureRoleAdmin::class])->group(function () {
+    // 1. DASHBOARD ADMIN
     Route::get('/admin-dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    // 2. MANAJEMEN JADWAL
     Route::get('/admin/edit', [AdminScheduleController::class, 'index'])->name('admin.schedules.index');
     Route::post('/admin/edit', [AdminScheduleController::class, 'store'])->name('admin.schedules.store');
     Route::put('/admin/edit/{id}', [AdminScheduleController::class, 'update'])->name('admin.schedules.update');
     Route::delete('/admin/edit/{id}', [AdminScheduleController::class, 'destroy'])->name('admin.schedules.destroy');
 
-    // --- PERBAIKAN DI SINI ---
-    // Ubah namanya menjadi 'admin.student.reset' agar sesuai dengan View Admin
+    // 3. MANAJEMEN STUDENT
     Route::post('/student/{id}/reset-schedule', [AdminController::class, 'resetStudentSchedule'])->name('admin.student.reset');
 });

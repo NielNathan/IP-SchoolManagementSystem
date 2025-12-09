@@ -62,7 +62,7 @@ th { background-color: #f9fafb; font-weight: 600; color: #374151; }
                     <td>{{ $material->title }}</td>
                     <td>{{ $material->subject->name ?? '-' }}</td>
                     <td>{{ $material->grade_level }}</td>
-                    <td>{{ \Carbon\Carbon::parse($material->created_at)->format('d M Y H:i') }}</td>
+                    <td>{{ Carbon::parse($material->created_at)->format('d M Y H:i') }}</td>
                     <td>
                         <div class="btn-group">
                             <a href="{{ route('instructor.materials.edit', $material->id) }}" class="btn btn-warning">
@@ -88,7 +88,7 @@ th { background-color: #f9fafb; font-weight: 600; color: #374151; }
     </div>
 </div>
 
-<!-- SweetAlert2 for delete material confirmation -->
+<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function(){

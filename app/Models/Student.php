@@ -12,11 +12,10 @@ class Student extends Model
         'phone',
     ];
 
-    // Relasi balik ke User
     public function user() {
         return $this->belongsTo(User::class);
     }
-    // Relasi melihat jadwal yang diambil
+
     public function schedules() {
         return $this->belongsToMany(Schedule::class, 'enrollments', 'student_id', 'schedule_id');
     }

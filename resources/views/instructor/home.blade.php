@@ -15,15 +15,12 @@
         body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* Header Style */
         .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         h1 { margin: 0; color: #111827; font-size: 24px; }
         p.subtitle { color: #6b7280; margin: 5px 0 0; font-size: 14px; }
         
-        /* Container Tombol Header */
         .header-actions { display: flex; gap: 10px; }
 
-        /* Upload Button (Biru) */
         .upload-btn { 
             background-color: #2563eb; 
             color: white; 
@@ -40,12 +37,10 @@
         }
         .upload-btn:hover { background-color: #1d4ed8; }
 
-        /* Class Card Style */
         .class-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fff; }
         .class-card h3 { margin: 0 0 10px; color: #2563eb; }
         .class-info { background: #f9fafb; padding: 10px; border-radius: 6px; font-size: 14px; color: #374151; font-weight: 600; margin-bottom: 15px; }
         
-        /* Button untuk Daftar Siswa */
         .btn-view-students {
             background-color: #10b981;
             color: white;
@@ -59,7 +54,6 @@
         }
         .btn-view-students:hover { background-color: #059669; }
 
-        /* Modal Styles */
         .modal-overlay { 
             display: none; 
             position: fixed; 
@@ -203,7 +197,7 @@
 
     </div>
 
-    <!-- Modal untuk Daftar Siswa -->
+    <!-- Modal -->
     <div class="modal-overlay" id="studentsModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -230,7 +224,6 @@
         
         $('#modalTitle').text('Daftar Siswa - ' + className);
         
-        // Build table
         let html = '';
         if (!students || students.length === 0) {
             html = '<p class="modal-empty">Belum ada siswa yang terdaftar pada mata pelajaran ini.</p>';
@@ -251,19 +244,16 @@
     }
     
     $(document).ready(function() {
-        // Open modal when clicking view students button
         $('.btn-view-students').on('click', function() {
             openStudentsModal(this);
         });
-        
-        // Close modal when clicking outside
+
         $('#studentsModal').on('click', function(e) {
             if (e.target === this) {
                 closeStudentsModal();
             }
         });
         
-        // Handle kick student from modal
         $(document).on('click', '.btn-kick-modal', function(e) {
             e.preventDefault();
             const btn = $(this);

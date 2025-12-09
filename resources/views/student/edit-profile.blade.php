@@ -191,8 +191,7 @@ input[type="file"]:focus {
     <form method="POST" action="{{ route('student.update-profile') }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
-
-        <!-- Photo Section -->
+        
         <div class="photo-section" style="justify-content: center; align-items: center; font-size: 48px; color: #9ca3af; background: white;">
             <div class="photo-preview">
                     <span>👤</span>
@@ -201,7 +200,6 @@ input[type="file"]:focus {
 
         <hr class="divider">
 
-        <!-- Personal Information -->
         <div class="form-group">
             <label for="fullname">📝 Nama Lengkap</label>
             <input type="text" id="fullname" name="fullname" value="{{ old('fullname', $student->fullname) }}" required>
@@ -228,7 +226,6 @@ input[type="file"]:focus {
 
         <hr class="divider">
 
-        <!-- Read-only Information -->
         <div style="background: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
             <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #111827;">📌 Informasi Tidak Dapat Diubah</h3>
             

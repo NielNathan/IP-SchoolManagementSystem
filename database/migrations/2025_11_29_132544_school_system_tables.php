@@ -10,7 +10,7 @@ return new class extends Migration
     {
         // 1. Update tabel Users (bawaan) - Tambah kolom Role
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('student'); // admin, student, teacher
+            $table->string('role')->default('student'); // Default role adalah 'student'
         });
 
         // 2. Tabel Subjects (Mata Pelajaran)
@@ -23,7 +23,7 @@ return new class extends Migration
         // 3. Tabel Instructors (Guru)
         Schema::create('instructors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Link ke Login
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); 
             $table->string('nip')->unique();
             $table->string('fullname');
             $table->timestamps();
@@ -32,7 +32,7 @@ return new class extends Migration
         // 4. Tabel Students (Siswa)
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Link ke Login
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); 
             $table->string('nis')->unique();
             $table->string('fullname');
             $table->string('class_grade'); // X, XI, XII
@@ -53,21 +53,22 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 6. Tabel Pivot (KRS / Pengambilan SKS)
+        // 6. Tabel Pengambilan Mapel 
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained('students');
             $table->foreignId('schedule_id')->constrained('schedules');
             $table->timestamps();
-            $table->unique(['student_id', 'schedule_id']); // Gaboleh ambil kelas sama 2x
+            $table->unique(['student_id', 'schedule_id']);
         });
 
+        // 7. Tabel Materials (Materi Pembelajaran)
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
-            $table->string('title'); // Judul Materi
-            $table->string('file_path'); // Lokasi file disimpan
-            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); // Mata Pelajaran apa
-            $table->foreignId('instructor_id')->constrained('instructors')->onDelete('cascade'); // Siapa guru yang upload
+            $table->string('title'); 
+            $table->string('file_path'); 
+            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); 
+            $table->foreignId('instructor_id')->constrained('instructors')->onDelete('cascade'); 
             $table->timestamps();
         });
     }

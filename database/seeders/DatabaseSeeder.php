@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         //  DATA GURU
-
         $teacherData = [
             ['Pak Budi', '198001', 'Budi Santoso, S.Pd', ['Matematika (Wajib)', 'Matematika (Peminatan)']],
             ['Bu Siti', '198502', 'Siti Aminah, M.Pd', ['Bahasa Indonesia', 'Sastra Indonesia']],
@@ -58,14 +57,12 @@ class DatabaseSeeder extends Seeder
                 'fullname' => $t[2]
             ]);
 
-            // Mapping Guru ke Mapel
             foreach ($t[3] as $mapelName) {
                 $instructorsBySubject[$mapelName][] = $instructor->id;
             }
         }
 
         // DATA SISWA
-
         $studentsData = [
             ['James', 'james@school.com', '2025001', 'James Albert Forisa', 'X-1'],
             ['Danelle', 'danelle@school.com', '2024002', 'Roland Danelle Guritno', 'XI-2'],
@@ -93,8 +90,6 @@ class DatabaseSeeder extends Seeder
         }
 
         // DATA JADWAL
-
-
         $subjectsWajib = [
             'Pendidikan Agama dan Budi Pekerti',
             'Pendidikan Pancasila dan Kewarganegaraan',
@@ -128,15 +123,10 @@ class DatabaseSeeder extends Seeder
         $busyTeachers = [];
 
         foreach ($jenjangs as $jenjang) {
-            
-            // Gabung semua mapel
             $allMapel = array_merge($subjectsWajib, $subjectsPilihan);
             
-            // --- PERBAIKAN UTAMA DI SINI ---
-            // Kita acak urutan mapel supaya Kelas X, XI, XII tidak sama persis urutannya
             shuffle($allMapel); 
             
-            // Reset counter waktu untuk setiap jenjang (karena X, XI, XII masuk bareng jam 7)
             $dayIndex = 0;
             $slotIndex = 0;
 
@@ -149,26 +139,21 @@ class DatabaseSeeder extends Seeder
                 $availableInstructors = $instructorsBySubject[$mapelName] ?? [];
                 
                 if (empty($availableInstructors)) {
-                    $instructorId = Instructor::first()->id; // Fallback
+                    $instructorId = Instructor::first()->id;
                 } else {
-                    // Logika Anti Bentrok Sederhana
                     $instructorId = null;
                     
-                    // Cek kandidat guru yang kosong di jam ini
+                    // Cek guru yang kosong di jam ini
                     foreach ($availableInstructors as $candidateId) {
                         $currentDay = $days[$dayIndex];
                         $currentTime = $timeSlots[$slotIndex][0];
 
-                        // Jika guru ini BELUM sibuk di hari & jam ini, pilih dia
                         if (!isset($busyTeachers[$candidateId][$currentDay][$currentTime])) {
                             $instructorId = $candidateId;
                             break;
                         }
                     }
-
-                    // Jika semua guru sibuk (misal Pak Budi ngajar kelas X dan XI di jam sama),
-                    // Kita harus memaksa ambil salah satu (atau skip). 
-                    // Di sini kita ambil acak saja biar tidak error.
+                    // Jika semua sibuk, ambil random
                     if (!$instructorId) {
                         $instructorId = $availableInstructors[array_rand($availableInstructors)];
                     }
@@ -185,7 +170,7 @@ class DatabaseSeeder extends Seeder
                     'quota' => 30
                 ]);
 
-                // Tandai guru sibuk di slot ini
+                // Tandai guru sibuk
                 $busyTeachers[$instructorId][$days[$dayIndex]][$timeSlots[$slotIndex][0]] = true;
 
                 // 4. Auto Assign Siswa (Khusus Mapel Wajib)
@@ -198,7 +183,6 @@ class DatabaseSeeder extends Seeder
                     }
                 }
 
-                // 5. Geser Waktu
                 $slotIndex++;
                 
                 // Jika slot hari ini habis (misal sudah 4 mapel), pindah hari besok

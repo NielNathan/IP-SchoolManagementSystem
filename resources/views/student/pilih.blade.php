@@ -33,7 +33,6 @@
 
 @section('content')
 
-{{-- Ambil data student dari Auth --}}
 @php
     $student = auth()->user()->student;
     $isFinal = $student->is_schedule_finalized;
@@ -117,7 +116,6 @@
         </form>
     </div>
 
-    {{-- KONDISI 2: JIKA BARU SAJA DI-SUBMIT (MUNCUL SEKALI) --}}
     @elseif(session('success_finalized'))
         <div class="submit-section submit-success">
             <h3 style="margin: 0; color: #15803d;">Jadwal Telah Disimpan</h3>
@@ -147,7 +145,6 @@
                     {{ substr($sched->time_start, 0, 5) }} - {{ substr($sched->time_end, 0, 5) }}
                 </td>
                 <td>
-                    {{-- Logic Tombol Ambil: Cek Final --}}
                     @if($isFinal)
                          <button type="button" class="btn-action btn-locked" disabled>🔒 Terkunci</button>
                     @else
@@ -173,9 +170,9 @@
             @endforelse
         </tbody>
     </table>
-
 </div>
 
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function(){

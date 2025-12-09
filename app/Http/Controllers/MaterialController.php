@@ -11,19 +11,17 @@ use Illuminate\Support\Facades\Storage;
 
 class MaterialController extends Controller
 {
-    // =========================================================================
-    // BAGIAN GURU (UPLOAD MATERI)
-    // =========================================================================
+    // Upload Materi (Guru)
     public function create()
     {
-        // Pastikan yang login adalah Guru
+        // Pastikan yang login punya Role Guru
         if (!Auth::user()->instructor) {
             abort(403, 'Akses ditolak. Halaman ini khusus Guru.');
         }
 
         $instructorId = Auth::user()->instructor->id;
 
-        // Ambil mapel yang diajar guru ini
+        // Ambil mapel yang diajar guru tersebut
         $subjects = Schedule::where('instructor_id', $instructorId)
                             ->with('subject')
                             ->get()
@@ -65,20 +63,15 @@ class MaterialController extends Controller
         return back()->with('success', 'Materi berhasil dipublish!');
     }
 
-    // =========================================================================
-    // BAGIAN SISWA (LIHAT MATERI)
-    // =========================================================================
+    // Download Materi (Siswa)
     public function index()
     {
-        // Pastikan yang login adalah Siswa
         if (!Auth::user()->student) {
             abort(403, 'Akses ditolak. Halaman ini khusus Siswa.');
         }
 
         $student = Auth::user()->student; 
 
-        // Perbaikan: Gunakan 'class_grade' bukan 'level_grade'
-        // Ambil jenjang kelas (misal "10" dari "10-A")
         $studentLevel = explode('-', $student->class_grade)[0]; 
 
         // Ambil materi yang sesuai jenjang kelas siswa
@@ -104,11 +97,7 @@ class MaterialController extends Controller
 
 
 
-    // =========================================================================
-    // BAGIAN GURU (KELOLA MATERI - LIST, EDIT, DELETE)
-    // =========================================================================
-    
-    // Tampilkan daftar materi yang diupload guru
+    // CRUD Materi (Guru)
     public function myMaterials()
     {
         if (!Auth::user()->instructor) {
@@ -124,7 +113,7 @@ class MaterialController extends Controller
         return view('instructor.materials.index', compact('materials'));
     }
 
-    // Tampilkan form edit materi
+    // Edit materi
     public function editMaterial($id)
     {
         if (!Auth::user()->instructor) {
@@ -182,12 +171,10 @@ class MaterialController extends Controller
 
         // Jika ada file baru, hapus file lama dan simpan yang baru
         if ($request->file('file')) {
-            // Hapus file lama
             if ($material->file_path && Storage::exists('public/' . $material->file_path)) {
                 Storage::delete('public/' . $material->file_path);
             }
 
-            // Simpan file baru
             $fileName = time() . '_' . $request->file('file')->getClientOriginalName();
             $path = $request->file('file')->storeAs('materials', $fileName, 'public');
             $updateData['file_path'] = $path;

@@ -2,7 +2,6 @@
     <div class="header-inner">
         <a class="brand" href="{{ url('/') }}">
             @if (file_exists(public_path('images/logo.svg')))
-                {{-- inline SVG may already include the school name, so do not duplicate text --}}
                 {!! file_get_contents(public_path('images/logo.svg')) !!}
             @elseif (file_exists(public_path('images/logo.png')))
                 <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'IP School') }} logo">
@@ -12,7 +11,7 @@
             @endif
         </a>
         
-        <!-- Navigation Menu for Students -->
+        <!-- Navigation Menu Students -->
         @auth
             @if(Auth::user()->role === 'student' || Auth::user()->role === null)
                 <nav class="nav-menu">
@@ -37,15 +36,15 @@
     </div>
 
     <style>
-        /* header with blue background and fixed on top - allows scrolling */
         .site-header-home{
-    position:fixed;
-    left:0;right:0;top:0;z-index:60;
-    display:flex;justify-content:center;align-items:center;
-    background:#2563eb;
-    padding:14px 24px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-}
+            position:fixed;
+            left:0;right:0;top:0;z-index:60;
+            display:flex;justify-content:center;align-items:center;
+            background:#2563eb;
+            padding:14px 24px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        }
+
         .header-inner{
             width:100%;
             max-width:1200px;
@@ -62,7 +61,6 @@
             font-family:'Poppins',system-ui,Segoe UI,Roboto,Helvetica,Arial;
         }
         
-        /* Navigation Menu */
         .nav-menu{
             display:flex;
             gap:8px;
@@ -70,15 +68,15 @@
             margin:0 20px;
         }
         .nav-item{
-    color:rgba(255,255,255,0.8);
-    text-decoration:none;
-    padding:10px 20px;
-    border-radius:6px;
-    font-size:15px;
-    font-weight:500;
-    transition:all 0.3s ease;
-    white-space:nowrap;
-}
+            color:rgba(255,255,255,0.8);
+            text-decoration:none;
+            padding:10px 20px;
+            border-radius:6px;
+            font-size:15px;
+            font-weight:500;
+            transition:all 0.3s ease;
+            white-space:nowrap;
+        }
         .nav-item:hover{
             background:rgba(255,255,255,0.15);
             color:white;
@@ -89,7 +87,6 @@
             font-weight:600;
         }
         
-        /* User Section */
         .user-section{
             display:flex;
             gap:12px;
@@ -106,21 +103,20 @@
             margin:0;
         }
         
-.logout-btn{
-    background:#ef4444;
-    color:white;
-    border:none;
-    padding:10px 20px;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:600;
-    font-size:14px;
-}
+        .logout-btn{
+            background:#ef4444;
+            color:white;
+            border:none;
+            padding:10px 20px;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:600;
+            font-size:14px;
+        }
         .logout-btn:hover{
             background:#dc2626;
         }
 
-        /* push page content down so header doesn't overlap - allow scroll */
         body{ padding-top:100px }
 
         @media (max-width:768px){

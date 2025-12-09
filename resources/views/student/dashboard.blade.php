@@ -169,7 +169,6 @@
             <p>Siswa Aktif</p>
         </div>
 
-        <!-- Info Grid -->
         <div class="info-grid">
             <div class="info-card">
                 <span class="info-card-label">📚 NIS</span>

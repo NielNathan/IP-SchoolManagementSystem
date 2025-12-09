@@ -64,6 +64,7 @@ class AdminController extends Controller
         return view('admin.home', compact('totalSiswa', 'totalGuru', 'totalKelas', 'topClasses', 'allClasses'));
     }
 
+    // Reset jadwal siswa jika ingin memilih ulang
     public function resetStudentSchedule($id)
     {
         $student = Student::find($id);
@@ -75,6 +76,7 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Status jadwal siswa berhasil di-reset. Siswa dapat mengambil mapel lagi.');
     }
 
+    // Reset semua jadwal siswa apabila naik kelas
     public function resetAllSchedules()
     {
         $students = Student::all();
