@@ -54,6 +54,16 @@ RUN composer install \
     --no-dev \
     --optimize-autoloader
 
+RUN mkdir -p \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache \
+    && touch storage/framework/views/.gitignore \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
 # Copy built frontend assets
 COPY --from=frontend /app/public/build ./public/build
 
@@ -68,10 +78,6 @@ RUN sed -i 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
 # Enable Apache modules
 RUN a2enmod rewrite headers
 
-# Configure Laravel directory permissions
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
-
 # Allow Laravel .htaccess
 RUN printf '<Directory /var/www/html/public>\n\
     AllowOverride All\n\
@@ -85,4 +91,4 @@ ENV APP_DEBUG=false
 EXPOSE 10000
 
 # Start Apache using Render's PORT variable
-CMD ["sh", "-c", "sed -i \"s/Listen 10000/Listen ${PORT:-10000}/\" /etc/apache2/ports.conf && sed -i \"s/:10000/:${PORT:-10000}/\" /etc/apache2/sites-available/000-default.conf && php artisan config:cache && php artisan migrate --force && exec apache2-foreground"]
+CMD ["sh", "-c", "sed -i \"s/Listen 10000/Listen ${PORT:-10000}/\" /etc/apache2/ports.conf && sed -i \"s/:10000/:${PORT:-10000}/\" /etc/apache2/sites-available/000-default.conf && php artisan config:clear && php artisan config:cache && php artisan migrate --force && exec apache2-foreground"]
