@@ -4,7 +4,7 @@ FROM node:20-bookworm-slim AS frontend
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 RUN npm run build
@@ -19,6 +19,7 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    libcurl4-openssl-dev \
     libzip-dev \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -26,6 +27,7 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
+    curl \
     pdo_mysql \
     mbstring \
     exif \
