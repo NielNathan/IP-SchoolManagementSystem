@@ -85,4 +85,4 @@ ENV APP_DEBUG=false
 EXPOSE 10000
 
 # Start Apache using Render's PORT variable
-CMD ["sh", "-c", "sed -i \"s/Listen 10000/Listen ${PORT:-10000}/\" /etc/apache2/ports.conf && sed -i \"s/:10000/:${PORT:-10000}/\" /etc/apache2/sites-available/000-default.conf && apache2-foreground"]
+CMD ["sh", "-c", "sed -i \"s/Listen 10000/Listen ${PORT:-10000}/\" /etc/apache2/ports.conf && sed -i \"s/:10000/:${PORT:-10000}/\" /etc/apache2/sites-available/000-default.conf && php artisan config:cache && php artisan migrate --force && exec apache2-foreground"]
